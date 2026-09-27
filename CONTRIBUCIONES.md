@@ -1,1 +1,1 @@
- Miguel Gómez - registro y desarrollo de la indentificacion de stakeholders, matriz - interés. - 58aa3f9
+ Miguel Gómez - registro y desarrollo de la indentificacion de stakeholders, matriz - interés. - https://github.com/JMC1963/2026-2-IReq-Grupo-05/commit/07ef7a4adc8191041b8aafbc13d2866b79c509ad
