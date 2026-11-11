@@ -1,0 +1,19 @@
+@startuml
+' DCU-02c · Vista «Inventario» (CU-06 y CU-07) · v1.0 · 10/11/2026
+title DCU-02c · Vista «Inventario» (CU-06 y CU-07) · v1.0
+left to right direction
+
+actor "Empleada" as EMP
+actor "Gerente" as GER
+rectangle "SIGCortinas" {
+  usecase "CU-06\nConsultar existencias de telas y productos" as CU06
+  usecase "CU-07\nRegistrar el ingreso de mercancía al inventario" as CU07
+}
+EMP -- CU06
+GER -- CU06
+GER -- CU07
+note as N1
+  CU-06 no modifica el inventario; CU-07 lo incrementa. CU-06 solo muestra lo que CU-07 dejó actualizado.
+  Fuera del límite: el pedido a la fábrica se hace en su portal (precondición de CU-07).
+end note
+@enduml
