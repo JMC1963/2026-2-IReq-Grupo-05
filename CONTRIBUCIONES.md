@@ -2,3 +2,6 @@
 Rafael Barriosnuevo - acta de constitucion (link pendiente)
 Rafael Barriosnuevo - guia entrevista empleada milena bermudez (link pendiente)
 Miguel Gómez - minuta de Kick-off (link pendiente)
+Rafael Barriosnuevo - casos de uso del 2 al 9 (link pendiente)
+Rafael Barriosnuevo - diagramas casos de uso  (link pendiente)
+Rafael Barriosnuevo - diagramas procesos actividades (link pendiente)
