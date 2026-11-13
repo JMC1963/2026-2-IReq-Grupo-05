@@ -1,0 +1,97 @@
+@startuml flujo-caso-uso
+' DAC-03 · Flujo detallado de CU-02 "Agendar visita de medición o instalación"
+' Fuente: 03-especificaciones/casos-de-uso/CU-02.docx. Solo se dibuja lo que cambia el flujo; las extensiones menores no se dibujan.
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam ActivityBackgroundColor #FFF6DB
+skinparam ActivityBorderColor #8A6D00
+skinparam ActivityDiamondBackgroundColor #FFF6DB
+skinparam ActivityDiamondBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFFFF
+skinparam swimlaneBorderColor #666666
+skinparam swimlaneTitleFontStyle bold
+skinparam wrapWidth 190
+skinparam maxMessageSize 190
+skinparam legendBackgroundColor #FFFFFF
+
+title DAC-03 · Flujo detallado de CU-02 «Agendar visita de medición o instalación»
+
+|Empleada|
+start
+:Indica el teléfono del cliente, el tipo de visita y la fecha y hora acordadas;
+note right
+  Pasos 1 a 3 del caso de uso: una sola acción del usuario
+end note
+
+|Sistema|
+if (¿El teléfono corresponde a un cliente registrado?) then ([no])
+  :Solicita el nombre y la dirección;
+  |Empleada|
+  :Ingresa el nombre y la dirección del cliente;
+  |Sistema|
+  :Registra al cliente nuevo;
+  note right
+    Extensión 3a
+  end note
+else ([sí])
+endif
+if (¿La visita es en una finca?) then ([sí])
+  :Asigna medio día o día completo y bloquea la franja del técnico;
+  note left
+    Extensión 4a
+  end note
+else ([no])
+  :Asigna la duración estimada según el tipo de visita;
+endif
+:Muestra la dirección, la duración y los técnicos del local;
+
+|Empleada|
+:Selecciona el técnico y registra las observaciones del trabajo;
+
+|Sistema|
+:Verifica que el técnico no tenga otra cita en ese horario;
+while (¿El técnico tiene una cita que se cruza?) is ([sí])
+  :Propone los siguientes horarios libres del técnico;
+  |Empleada|
+  :Elige otro horario;
+  |Sistema|
+  :Verifica que el técnico no tenga otra cita en ese horario;
+  note right
+    Extensión 6a
+  end note
+endwhile ([no])
+
+|Empleada|
+if (¿Confirma el agendamiento?) then ([no])
+  |Sistema|
+  :Descarta los datos ingresados;
+  note right
+    Extensión 7a: el caso de uso termina sin crear la cita
+  end note
+  stop
+else ([sí])
+  :Confirma el agendamiento;
+endif
+
+|Sistema|
+:Guarda la cita en estado "Programada";
+:Cita : programada]
+fork
+  :Publica la cita en la agenda compartida;
+  note left
+    Paso 8: ambas ramas salen de la cita guardada y ninguna usa lo que produce la otra. La garantía de éxito exige las dos.
+  end note
+fork again
+  :Envía la notificación de la nueva visita>
+  |Técnico|
+  :Notificación de visita recibida<
+  |Sistema|
+end fork
+stop
+
+legend bottom left
+  Pasos 1 a 3, 4, 5, 6, 7 y 8 del escenario principal. Extensiones dibujadas: 3a, 4a, 6a y 7a. Garantía mínima: si no se confirma, no se crea ninguna cita.
+endlegend
+@enduml

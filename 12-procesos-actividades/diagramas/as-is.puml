@@ -1,0 +1,126 @@
+@startuml as-is
+' DAC-01 · Proceso actual (AS-IS) · Cortinas Ambiente Moderno
+' Fuente de los pasos: entrevista a Milena Bermudez (28/09/2026) y casos de uso CU-01 a CU-10.
+' Rosa = problema (PA-nn). Blanco = duda por validar en el taller.
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam ActivityBackgroundColor #FFF6DB
+skinparam ActivityBorderColor #8A6D00
+skinparam ActivityDiamondBackgroundColor #FFF6DB
+skinparam ActivityDiamondBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFFFF
+skinparam swimlaneBorderColor #666666
+skinparam swimlaneTitleFontStyle bold
+skinparam wrapWidth 190
+skinparam maxMessageSize 190
+skinparam legendBackgroundColor #FFFFFF
+
+title DAC-01 · Proceso actual (AS-IS): atender un pedido de cortinas, de la llegada del cliente a la validación de su satisfacción
+
+|Cliente|
+start
+:Llega o llama al local y pide un pedido;
+
+|Gerente|
+:Asesora al cliente;
+
+|Empleada|
+:Revisa a ojo si hay existencia de la tela;
+note right #F8D7DA
+  **PA-02** Sin registro de existencias: el stock se calcula "a ojo".
+end note
+note right
+  Duda: quién revisa y qué se hace si no hay (preguntas 7 y 12 de la guía sin respuesta registrada).
+end note
+
+|Técnico|
+:Toma las medidas del trabajo;
+note right
+  Duda: quién las toma y dónde. La entrevista dice que si no coinciden "la falla es del Técnico", lo que sugiere que las toma él.
+end note
+:Medidas anotadas]
+
+|Empleada|
+:Anota nombre, teléfono y pedido en el cuaderno;
+note right #F8D7DA
+  **PA-01** Cuaderno y memoria son el único registro; a veces se le olvida anotar.
+  **PA-08** Sin buscador para consultar pedidos antiguos.
+end note
+:Pedido en el cuaderno]
+
+|Cliente|
+:Entrega la mitad del valor como abono;
+
+|Empleada|
+:Anota el abono en el cuaderno;
+note right #F8D7DA
+  **PA-07** El pago por mitades queda solo a mano; el Excel de la gerente solo suma.
+end note
+
+|Gerente|
+:Tramita el pedido en el portal de la fábrica;
+
+|Fábrica|
+:Fabrica y despacha el pedido;
+note right
+  Telas: unos 3 días. Cortinas: unos 8 días (entrevista).
+end note
+
+|Gerente|
+:Recibe la mercancía en el local;
+note right
+  Duda: quién la recibe y cómo se anota (pregunta 10 sin respuesta registrada).
+end note
+
+|Empleada|
+:Pasan unos 8 días desde el pedido<
+note right #F8D7DA
+  **PA-04** Ningún registro avisa cuándo llamar al cliente: depende de la memoria (hipótesis, por validar).
+end note
+:Llama al cliente para confirmar la visita;
+while (¿El cliente pide aplazar?) is ([sí])
+  :Anota la nueva fecha en el cuaderno;
+  note right #F8D7DA
+    **PA-05** Aplazar citas es la principal dificultad: se repite la llamada y se reescribe la cita.
+    **PA-03** La gerente lleva otra agenda: pueden quedar distintas.
+  end note
+  :Llama de nuevo para confirmar la nueva fecha;
+endwhile ([no])
+note right
+  Duda: cómo se entera el técnico de la cita (pregunta 9 sin respuesta registrada).
+end note
+
+|Técnico|
+:Instala el pedido en el sitio;
+note right
+  Una instalación dura cerca de 1 hora; en finca, medio día o todo el día (entrevista).
+end note
+if (¿Las medidas coinciden con las del pedido?) then ([sí])
+else ([no])
+  |Gerente|
+  :Asume el costo de corregir el trabajo;
+  note right #F8D7DA
+    **PA-06** No queda registro de quién tomó las medidas ni de lo que costó el error.
+  end note
+endif
+
+|Cliente|
+:Entrega la otra mitad del valor al terminar;
+
+|Empleada|
+:Anota el pago en el cuaderno;
+:Llama al cliente para validar su satisfacción;
+note right #F8D7DA
+  **PA-09** No queda registro de la llamada ni de lo que dijo el cliente (hipótesis, por validar).
+end note
+stop
+
+legend bottom left
+  Rosa: problema del proceso actual, numerado como PA-nn (ver hallazgos-brechas.md).
+  Blanco: duda por validar con el dueño de la calle en el taller.
+  Calles: roles. Aquí el "sistema" es el cuaderno y la hoja de Excel, que maneja una persona.
+  Fuera de límites: garantías con la fábrica, quejas y compras de inventario sin pedido de cliente.
+endlegend
+@enduml
