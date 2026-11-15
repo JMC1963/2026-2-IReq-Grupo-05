@@ -1,0 +1,143 @@
+@startuml to-be
+' DAC-02 · Proceso futuro (TO-BE) · Cortinas Ambiente Moderno
+' Propuesta de rediseño: se valida con los duenos de calle en el segundo taller.
+' Notas amarillas: caso de uso (CU-nn) y brecha (B-nn). Blanco: duda. RN-nn: requisito nuevo propuesto.
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam ActivityBackgroundColor #FFF6DB
+skinparam ActivityBorderColor #8A6D00
+skinparam ActivityDiamondBackgroundColor #FFF6DB
+skinparam ActivityDiamondBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFFFF
+skinparam swimlaneBorderColor #666666
+skinparam swimlaneTitleFontStyle bold
+skinparam wrapWidth 190
+skinparam maxMessageSize 190
+skinparam legendBackgroundColor #FFFFFF
+skinparam NoteBackgroundColor #FFFBE6
+
+title DAC-02 · Proceso futuro (TO-BE): atender un pedido de cortinas con SIGCortinas
+
+|Cliente|
+start
+:Llega o llama al local y pide un pedido;
+
+|Gerente|
+:Asesora al cliente;
+
+|Empleada|
+:Consulta las existencias de la tela;
+
+|Sistema|
+:Muestra la existencia y alerta si es baja o está agotada;
+note right
+  CU-06 · B-02
+end note
+note right #FFFFFF
+  Duda: qué se hace si la tela está agotada (pregunta 12 sin respuesta registrada).
+end note
+
+|Técnico|
+:Toma las medidas del trabajo;
+
+|Cliente|
+:Entrega el abono inicial;
+
+|Empleada|
+:Registra el pedido con las medidas y el abono;
+
+|Sistema|
+:Guarda el pedido "Pendiente" y el abono;
+note right
+  CU-01 · B-01 (reemplaza el cuaderno)
+end note
+:Pedido : pendiente]
+
+|Gerente|
+:Tramita el pedido en el portal de la fábrica;
+note right #FFFFFF
+  El portal se conserva fuera del sistema (sin integración).
+end note
+
+|Fábrica|
+:Fabrica y despacha el pedido;
+
+|Gerente|
+:Registra el ingreso de la mercancía (CU-07)|
+note right
+  CU-07 · B-03
+end note
+
+|Empleada|
+:Agenda la visita de instalación (CU-02)|
+note right
+  Se detalla en DAC-03 · CU-02 · B-04
+end note
+
+|Sistema|
+:Llega el día de la visita<
+note right #FFFFFF
+  Duda: la confirmación se hace la víspera o el mismo día (por definir con la gerente).
+end note
+:Resalta las citas por confirmar;
+note right
+  CU-03 · B-05
+end note
+
+|Empleada|
+repeat
+  :Llama al cliente para confirmar la visita;
+backward :Reprograma la cita (CU-04)|
+repeat while (¿El cliente pide aplazar?) is ([sí]) not ([no])
+note right
+  CU-04 · B-06 (avisa al técnico y a la gerente)
+end note
+:Registra la confirmación de la visita;
+note right
+  RN-01 (nuevo) · B-05
+end note
+
+|Técnico|
+:Instala el pedido en el sitio;
+:Registra el resultado de la visita (CU-10)|
+
+|Sistema|
+:Marca la cita como realizada y avisa a la empleada;
+note right
+  CU-10 · B-07
+end note
+if (¿Las medidas coinciden con las del pedido?) then ([sí])
+else ([no])
+  :Muestra la diferencia y quién tomó las medidas originales;
+  |Gerente|
+  :Define quién asume el costo;
+  note right
+    B-07 (cambio de procedimiento)
+  end note
+endif
+
+|Cliente|
+:Entrega el saldo al terminar;
+
+|Empleada|
+:Registra el pago del saldo (CU-05)|
+note right
+  CU-05 · B-08
+end note
+:Llama al cliente para validar su satisfacción;
+:Registra la validación de satisfacción;
+note right
+  RN-02 (nuevo) · B-09
+end note
+:Comprobante : entregado al cliente]
+stop
+
+legend bottom left
+  Amarillo: caso de uso (CU-nn) y brecha (B-nn) que respalda la acción. Rectángulo con doble borde: subactividad con su propio diagrama o caso de uso.
+  RN-nn: requisito nuevo propuesto (ID definitivo por asignar). Blanco: duda por validar.
+  Se conserva en personas: asesorar, tomar medidas, instalar y las llamadas al cliente. Se elimina: el cuaderno y las agendas separadas.
+  Fuera de límites: garantías con la fábrica (CU-09), quejas e historial de clientes (CU-08, consulta aparte).
+endlegend
+@enduml
