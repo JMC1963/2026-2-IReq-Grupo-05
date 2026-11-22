@@ -1,0 +1,53 @@
+@startuml DSE-02
+' DSE-02 · Registrar una garantía enviada a la fábrica (CU-09)
+' Fuente: 03-especificaciones/casos-de-uso/CU-09.docx; 08-requisitos-29148/glosario.md
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam SequenceLifeLineBorderColor #666666
+skinparam ParticipantBackgroundColor #FFF6DB
+skinparam ParticipantBorderColor #8A6D00
+skinparam ActorBackgroundColor #FFF6DB
+skinparam ActorBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFBE6
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam wrapWidth 220
+skinparam maxMessageSize 220
+skinparam responseMessageBelowArrow true
+title DSE-02 · Registrar una garantía enviada a la fábrica (CU-09)\nInteracción entre componentes lógicos (nivel 2) · ESC-01, ESC-02, ESC-03, ESC-04
+
+actor "Gerente" as G
+participant "Seguimiento de garantías" as GAR
+participant "Registro de pedidos" as PED
+
+G -> GAR : Iniciar registro de garantía
+GAR --> G : Solicitud de pedido y artículo
+G -> GAR : Seleccionar pedido y artículo
+GAR -> PED : Buscar pedido y artículo
+PED --> GAR : Datos del pedido y del artículo, o pedido no registrado
+alt [pedido no registrado (3a)]
+  GAR --> G : Solicitud de datos mínimos del cliente y del artículo
+  G -> GAR : Enviar datos mínimos del cliente y del artículo
+  GAR -> PED : Registrar datos mínimos del pedido de origen
+  PED --> GAR : Pedido de origen registrado
+end
+GAR --> G : Solicitud de motivo, fecha de envío y referencia del caso
+G -> GAR : Enviar datos de la garantía
+alt [fecha de envío posterior a hoy (5a)]
+  GAR --> G : Rechazo de la fecha y solicitud de una fecha válida
+  note over G,GAR : Retoma en el paso 5
+else [fecha de envío válida]
+  GAR -> PED : Verificar que el artículo pertenece al pedido
+  PED --> GAR : Pertenencia del artículo
+  GAR -> GAR : Buscar garantía abierta del artículo
+  break [el artículo ya tiene una garantía abierta (6a)]
+    GAR --> G : Garantía existente con sus días transcurridos
+  end
+  GAR --> G : Resumen de la garantía para confirmar
+  G -> GAR : Confirmar registro de garantía
+  GAR -> GAR : Crear garantía «En fábrica» y calcular días transcurridos
+  GAR --> G : Garantía «En fábrica» con días transcurridos y plazo de espera
+end
+note over GAR,PED : Si la garantía no se confirma, no se crea y el pedido y el artículo conservan su estado (garantía mínima). Sin mensajes al portal de la fábrica.
+@enduml

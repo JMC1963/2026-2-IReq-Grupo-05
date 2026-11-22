@@ -1,0 +1,46 @@
+@startuml DSE-01
+' DSE-01 · Registrar una garantía enviada a la fábrica (CU-09)
+' Fuente: 03-especificaciones/casos-de-uso/CU-09.docx; 13-secuencia/fichas/ESC-01.md
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam SequenceLifeLineBorderColor #666666
+skinparam ParticipantBackgroundColor #FFF6DB
+skinparam ParticipantBorderColor #8A6D00
+skinparam ActorBackgroundColor #FFF6DB
+skinparam ActorBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFBE6
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam wrapWidth 220
+skinparam maxMessageSize 220
+skinparam responseMessageBelowArrow true
+title DSE-01 · Registrar una garantía enviada a la fábrica (CU-09)\nSecuencia del sistema (nivel 1) · ESC-01 a ESC-04
+
+actor "Gerente" as G
+participant "Sistema SIGCortinas" as S
+
+G -> S : Iniciar registro de garantía
+S --> G : Solicitud de pedido y artículo
+G -> S : Seleccionar pedido y artículo
+alt [pedido no registrado en el sistema (3a)]
+  S --> G : Solicitud de datos mínimos del cliente y del artículo
+  G -> S : Enviar datos mínimos del cliente y del artículo
+else [pedido registrado]
+end
+S --> G : Solicitud de motivo, fecha de envío y referencia del caso
+G -> S : Enviar datos de la garantía
+alt [fecha de envío posterior a hoy (5a)]
+  S --> G : Rechazo de la fecha y solicitud de una fecha válida
+  note over G,S : Retoma en el paso 5
+else [fecha de envío válida]
+  break [el artículo ya tiene una garantía abierta (6a)]
+    S --> G : Garantía existente con sus días transcurridos
+    note over G,S : El caso de uso termina sin crear una nueva garantía
+  end
+  S --> G : Resumen de la garantía para confirmar
+  G -> S : Confirmar registro de garantía
+  S --> G : Garantía «En fábrica» con días transcurridos y plazo de espera
+end
+note over G,S : Sin mensajes al portal de la fábrica: queda fuera del límite del sistema. La alerta de plazo excedido se muestra al abrir el panel (CU-03, ext. 2c).
+@enduml
