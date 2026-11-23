@@ -1,0 +1,19 @@
+@startuml
+title DES-01 v0.2 - Ciclo de vida de una cita
+skinparam backgroundColor white
+skinparam state { BackgroundColor #EAF2FC BorderColor #245783 FontColor #102841 }
+[*] --> Programada : T-01 Confirmar agendamiento\n[datos completos y sin cruce] / crear y avisar
+Programada --> Programada : T-02 Reprogramar\n[fecha futura y libre] / actualizar y avisar
+Programada --> Cancelada : T-03 Cancelar\n[motivo registrado] / liberar franja y avisar
+Programada --> Realizada : T-04 Registrar resultado\n[datos completos] / guardar y avisar
+Programada --> "No realizada" : T-05 Cliente ausente\n[ausencia confirmada] / avisar
+Cancelada --> [*]
+Realizada --> [*]
+"No realizada" --> [*]
+note right of Programada
+  No son estados: Por confirmar,
+  En finca, Reprogramada.
+  Cruce / fecha pasada: se rechazan
+  sin transición de estado.
+end note
+@enduml
