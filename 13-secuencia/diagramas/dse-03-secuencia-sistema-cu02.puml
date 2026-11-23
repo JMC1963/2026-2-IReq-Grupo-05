@@ -1,0 +1,48 @@
+@startuml DSE-03
+' DSE-03 · Agendar visita de medición o instalación (CU-02)
+' Fuente: 03-especificaciones/casos-de-uso/CU-02.docx; 13-secuencia/fichas/ESC-05.md
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam SequenceLifeLineBorderColor #666666
+skinparam ParticipantBackgroundColor #FFF6DB
+skinparam ParticipantBorderColor #8A6D00
+skinparam ActorBackgroundColor #FFF6DB
+skinparam ActorBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFBE6
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam wrapWidth 220
+skinparam maxMessageSize 220
+skinparam responseMessageBelowArrow true
+title DSE-03 · Agendar visita de medición o instalación (CU-02)\nSecuencia del sistema (nivel 1) · ESC-05 a ESC-08
+
+actor "Empleada" as E
+participant "Sistema SIGCortinas" as S
+actor "Técnico" as T
+
+E -> S : Iniciar agendamiento de visita
+S --> E : Solicitud de teléfono, tipo de visita y fecha y hora
+E -> S : Enviar datos de la cita
+alt [teléfono sin cliente registrado (3a)]
+  S --> E : Solicitud de nombre y dirección del cliente
+  E -> S : Enviar nombre y dirección del cliente
+end
+S --> E : Datos del cliente, duración estimada y técnicos del local
+note over S : Ext. 4a (visita en finca): no dibujada; es una regla interna de duración
+E -> S : Elegir técnico y registrar observaciones
+alt [el técnico tiene un cruce de horario (6a)]
+  S --> E : Cruce detectado y siguientes horarios libres del técnico
+  note over E,S : Retoma en el paso 5
+else [el técnico está libre]
+  S --> E : Horario disponible para confirmar
+  break [la empleada cancela antes de confirmar (7a)]
+    E -> S : Cancelar agendamiento
+    S --> E : Datos descartados, sin cita creada
+  end
+  E -> S : Confirmar agendamiento
+  S --> E : Cita «Programada» en la agenda compartida
+  S ->> T : Aviso de nueva visita
+  note over S,T : Asíncrono: el aviso queda visible en el panel del Técnico al iniciar sesión; la comunicación con él es presencial
+end
+@enduml

@@ -1,0 +1,58 @@
+@startuml DSE-04
+' DSE-04 · Agendar visita de medición o instalación (CU-02)
+' Fuente: 03-especificaciones/casos-de-uso/CU-02.docx; 08-requisitos-29148/glosario.md
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam ArrowColor #222222
+skinparam SequenceLifeLineBorderColor #666666
+skinparam ParticipantBackgroundColor #FFF6DB
+skinparam ParticipantBorderColor #8A6D00
+skinparam ActorBackgroundColor #FFF6DB
+skinparam ActorBorderColor #8A6D00
+skinparam NoteBorderColor #8A6D00
+skinparam NoteBackgroundColor #FFFBE6
+skinparam SequenceGroupBackgroundColor #FFFFFF
+skinparam wrapWidth 220
+skinparam maxMessageSize 220
+skinparam responseMessageBelowArrow true
+title DSE-04 · Agendar visita de medición o instalación (CU-02)\nInteracción entre componentes lógicos (nivel 2) · ESC-05, ESC-06, ESC-07, ESC-08
+
+actor "Empleada" as E
+participant "Agenda" as AGE
+participant "Registro de clientes" as CLI
+participant "Avisos" as AVI
+actor "Técnico" as T
+
+E -> AGE : Iniciar agendamiento de visita
+AGE --> E : Solicitud de teléfono, tipo de visita y fecha y hora
+E -> AGE : Enviar datos de la cita
+AGE -> CLI : Buscar cliente por teléfono
+CLI --> AGE : Cliente encontrado, o cliente no registrado
+alt [teléfono sin cliente registrado (3a)]
+  AGE --> E : Solicitud de nombre y dirección del cliente
+  E -> AGE : Enviar nombre y dirección del cliente
+  AGE -> CLI : Registrar cliente nuevo
+  CLI --> AGE : Cliente registrado
+end
+AGE -> AGE : Calcular duración estimada según el tipo de visita
+AGE --> E : Datos del cliente, duración estimada y técnicos del local
+loop [hasta que el técnico elegido no tenga cruce (6a)]
+  E -> AGE : Elegir técnico y registrar observaciones
+  AGE -> AGE : Verificar cruce del técnico
+  opt [el técnico tiene un cruce (6a)]
+    AGE --> E : Cruce detectado y siguientes horarios libres del técnico
+  end
+end
+AGE --> E : Horario disponible para confirmar
+break [la empleada cancela antes de confirmar (7a)]
+  E -> AGE : Cancelar agendamiento
+  AGE --> E : Datos descartados, sin cita creada
+end
+E -> AGE : Confirmar agendamiento
+AGE -> AGE : Guardar cita «Programada» en la agenda compartida
+AGE -> AVI : Registrar aviso de nueva visita
+AVI --> AGE : Aviso registrado
+AGE --> E : Cita «Programada» en la agenda compartida
+AVI ->> T : Aviso de nueva visita
+note over AVI,T : Asíncrono: visible en el panel del Técnico al iniciar sesión. Ext. 4a (finca): no dibujada, regla interna de duración.
+@enduml
