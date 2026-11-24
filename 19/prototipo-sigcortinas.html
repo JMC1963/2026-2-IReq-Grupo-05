@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGCortinas — Prototipo Funcional v0.1</title>
+  <style>
+    /* ==========================================================================
+       1. TOKENS DE COLOR Y TIPOGRAFÍA (Guía de estilo mínima — SIGCortinas v0.1)
+       ========================================================================== */
+    :root {
+      --color-primario: #1f5c8b;       /* Contraste #ffffff / #1f5c8b = 7.09:1 */
+      --color-primario-hover: #17466b;
+      --color-acento: #b8860b;         /* Solo decoración / bordes / texto oscuro #1a1a1a (5.35:1) */
+      --color-ok: #1b7a3c;             /* Contraste #ffffff / #1b7a3c = 5.39:1 */
+      --color-ok-fondo: #e8f5ec;       /* Contraste #1b7a3c / #e8f5ec = 4.80:1 */
+      --color-error: #b3261e;          /* Contraste #ffffff / #b3261e = 6.54:1 */
+      --color-error-fondo: #fdecea;    /* Contraste #b3261e / #fdecea = 5.72:1 */
+      --color-adv-fondo: #fef7e0;
+      --color-texto: #1a1a1a;          /* Contraste #1a1a1a / #ffffff = 17.40:1 */
+      --color-fondo: #ffffff;
+      --color-fondo-suave: #f3f5f7;    /* Contraste #1a1a1a / #f3f5f7 = 15.92:1 */
+      --color-borde: #8a8f94;          /* Contraste #8a8f94 / #ffffff = 3.26:1 */
+
+      --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 12px;
+      --sp-4: 16px;
+      --sp-5: 24px;
+      --sp-6: 32px;
+      --radius: 6px;
+      --control-height: 44px;
+    }
+
+    /* ==========================================================================
+       2. RESET, ACCESIBILIDAD Y FOCO VISIBLE (Anillo sólido 3px #1a1a1a)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--color-texto);
+      background-color: var(--color-fondo);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    *:focus-visible {
+      outline: 3px solid var(--color-texto);
+      outline-offset: 2px;
+    }
+
+    h1 {
+      font-size: 1.75rem; /* 28px */
+      line-height: 1.25;
+      margin: 0 0 var(--sp-3) 0;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 1.375rem; /* 22px */
+      line-height: 1.25;
+      margin: 0 0 var(--sp-3) 0;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 1.125rem;
+      line-height: 1.25;
+      margin: 0 0 var(--sp-2) 0;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 var(--sp-3) 0;
+    }
+
+    .help-text {
+      font-size: 0.875rem; /* 14px mínimo */
+      color: var(--color-texto);
+      margin-top: var(--sp-1);
+      display: block;
+    }
+
+    /* ==========================================================================
+       3. BARRA DE SIMULACIÓN DE ESTADOS (Herramienta de evaluación del prototipo)
+       ========================================================================== */
+    .proto-toolbar {
+      background-color: var(--color-fondo-suave);
+      border-bottom: 2px solid var(--color-acento);
+      padding: var(--sp-2) var(--sp-4);
+      font-size: 0.875rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-2);
+    }
+
+    .proto-toolbar__group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .proto-badge {
+      background-color: var(--color-acento);
+      color: var(--color-texto);
+      font-weight: 700;
+      padding: 2px var(--sp-2);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+    }
+
+    .proto-select, .proto-btn {
+      min-height: 36px;
+      padding: var(--sp-1) var(--sp-3);
+      font-family: inherit;
+      font-size: 0.875rem;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      cursor: pointer;
+    }
+
+    .proto-btn:hover {
+      background-color: var(--color-fondo-suave);
+    }
+
+    /* ==========================================================================
+       4. ENCABEZADO Y NAVEGACIÓN PRINCIPAL
+       ========================================================================== */
+    .app-header {
+      background-color: var(--color-fondo);
+      border-bottom: 1px solid var(--color-borde);
+      border-top: 4px solid var(--color-primario);
+    }
+
+    .app-header__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--sp-3) var(--sp-4);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      text-decoration: none;
+      color: var(--color-texto);
+    }
+
+    .brand__mark {
+      width: 12px;
+      height: 28px;
+      background-color: var(--color-acento);
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .brand__title {
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand__sub {
+      font-size: 0.875rem;
+      color: var(--color-texto);
+    }
+
+    .user-session {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-3);
+    }
+
+    .role-pill {
+      background-color: var(--color-fondo-suave);
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+      padding: var(--sp-1) var(--sp-3);
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .main-nav {
+      background-color: var(--color-fondo-suave);
+      border-bottom: 1px solid var(--color-borde);
+    }
+
+    .main-nav__list {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--sp-2) var(--sp-4);
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+
+    .nav-btn {
+      min-height: var(--control-height);
+      padding: var(--sp-2) var(--sp-4);
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-primario);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .nav-btn:hover {
+      background-color: var(--color-fondo);
+      border-color: var(--color-borde);
+    }
+
+    .nav-btn[aria-current="page"] {
+      background-color: var(--color-primario);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       5. CONTENEDOR PRINCIPAL Y TARJETAS / PANELES
+       ========================================================================== */
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--sp-5) var(--sp-4);
+      flex: 1;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.is-active {
+      display: block;
+    }
+
+    .screen-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      margin-bottom: var(--sp-5);
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px solid var(--color-borde);
+    }
+
+    .panel {
+      background-color: var(--color-fondo);
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+      padding: var(--sp-4);
+      margin-bottom: var(--sp-4);
+    }
+
+    .panel--soft {
+      background-color: var(--color-fondo-suave);
+    }
+
+    .panel--summary {
+      background-color: var(--color-fondo-suave);
+      border-left: 4px solid var(--color-primario);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--sp-4);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--sp-4);
+    }
+
+    /* ==========================================================================
+       6. COMPONENTES: BOTONES, CAMPOS, SELECTORES, INSIGNIAS Y BANDAS DE MENSAJE
+       ========================================================================== */
+    .btn {
+      min-height: var(--control-height);
+      padding: var(--sp-2) var(--sp-4);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background-color: var(--color-primario);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--color-primario-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: var(--color-fondo);
+      color: var(--color-primario);
+      border-color: var(--color-borde);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--color-fondo-suave);
+    }
+
+    .btn-danger-outline {
+      background-color: var(--color-fondo);
+      color: var(--color-error);
+      border-color: var(--color-error);
+    }
+
+    .btn-danger-outline:hover:not(:disabled) {
+      background-color: var(--color-error-fondo);
+    }
+
+    .actions-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-top: var(--sp-4);
+    }
+
+    /* Campos de formulario */
+    .form-group {
+      margin-bottom: var(--sp-4);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--sp-1);
+      color: var(--color-texto);
+    }
+
+    .req-mark {
+      color: var(--color-error);
+      font-weight: 700;
+      margin-left: 2px;
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: var(--control-height);
+      padding: var(--sp-2) var(--sp-3);
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--color-texto);
+      background-color: var(--color-fondo);
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+    }
+
+    textarea.form-control {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .form-control.is-invalid {
+      border: 2px solid var(--color-error);
+      background-color: var(--color-error-fondo);
+    }
+
+    .field-error {
+      color: var(--color-error);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: var(--sp-1);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-1);
+    }
+
+    /* Bandas de mensaje */
+    .banner {
+      padding: var(--sp-3) var(--sp-4);
+      border-radius: var(--radius);
+      margin-bottom: var(--sp-4);
+      border: 1px solid var(--color-borde);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-3);
+    }
+
+    .banner--error {
+      background-color: var(--color-error-fondo);
+      border-color: var(--color-error);
+      color: var(--color-error);
+    }
+
+    .banner--ok {
+      background-color: var(--color-ok-fondo);
+      border-color: var(--color-ok);
+      color: var(--color-ok);
+    }
+
+    .banner--warning {
+      background-color: var(--color-adv-fondo);
+      border-color: var(--color-acento);
+      color: var(--color-texto);
+    }
+
+    .banner--info {
+      background-color: var(--color-fondo-suave);
+      border-color: var(--color-primario);
+      color: var(--color-texto);
+    }
+
+    .banner__icon {
+      font-weight: 700;
+      font-size: 1.125rem;
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+
+    .banner__body {
+      flex: 1;
+    }
+
+    .banner__title {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .error-summary-list {
+      margin: var(--sp-2) 0 0 0;
+      padding-left: var(--sp-5);
+    }
+
+    .error-summary-list a {
+      color: var(--color-error);
+      font-weight: 600;
+    }
+
+    /* Insignias de estado (texto + símbolo + color) */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      padding: 4px var(--sp-2);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 700;
+      border: 1px solid var(--color-borde);
+      white-space: nowrap;
+    }
+
+    .badge--neutral {
+      background-color: var(--color-fondo-suave);
+      color: var(--color-texto);
+      border-color: var(--color-borde);
+    }
+
+    .badge--warning {
+      background-color: var(--color-adv-fondo);
+      color: var(--color-texto);
+      border-color: var(--color-acento);
+    }
+
+    .badge--error {
+      background-color: var(--color-error-fondo);
+      color: var(--color-error);
+      border-color: var(--color-error);
+    }
+
+    .badge--ok {
+      background-color: var(--color-ok-fondo);
+      color: var(--color-ok);
+      border-color: var(--color-ok);
+    }
+
+    /* ==========================================================================
+       7. TABLAS Y TARJETAS RESPONSIVE (360px sin desplazamiento horizontal)
+       ========================================================================== */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      background-color: var(--color-fondo);
+    }
+
+    th, td {
+      padding: var(--sp-3);
+      border-bottom: 1px solid var(--color-borde);
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: var(--color-fondo-suave);
+      font-weight: 700;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--color-fondo-suave);
+    }
+
+    /* Tarjetas móviles para P-02 (especial para Técnico en 360px) */
+    .agenda-cards {
+      display: none;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+
+    .agenda-card {
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radius);
+      padding: var(--sp-3);
+      background-color: var(--color-fondo);
+    }
+
+    .agenda-card--pending {
+      border-left: 4px solid var(--color-acento);
+    }
+
+    .agenda-card__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-2);
+    }
+
+    .agenda-card__time {
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+
+    .agenda-card__meta {
+      font-size: 0.875rem;
+      margin-bottom: var(--sp-2);
+    }
+
+    /* Correo automático simulado (M-01 / M-02) */
+    .email-preview {
+      border: 1px dashed var(--color-primario);
+      background-color: var(--color-fondo-suave);
+      padding: var(--sp-3);
+      border-radius: var(--radius);
+      margin-top: var(--sp-3);
+      font-size: 0.875rem;
+    }
+
+    /* Franjas libres sugeridas en P-04 */
+    .slot-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+      margin-top: var(--sp-2);
+    }
+
+    .slot-btn {
+      min-height: var(--control-height);
+      padding: var(--sp-2) var(--sp-3);
+      background-color: var(--color-fondo);
+      border: 1px solid var(--color-primario);
+      color: var(--color-primario);
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.875rem;
+    }
+
+    .slot-btn:hover {
+      background-color: var(--color-primario);
+      color: #ffffff;
+    }
+
+    /* Resumen clave-valor */
+    .kv-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--sp-3);
+      margin: 0;
+    }
+
+    .kv-item dt {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-texto);
+    }
+
+    .kv-item dd {
+      margin: 2px 0 0 0;
+      font-weight: 700;
+    }
+
+    /* Pie de página */
+    .app-footer {
+      border-top: 1px solid var(--color-borde);
+      background-color: var(--color-fondo-suave);
+      padding: var(--sp-3) var(--sp-4);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    /* Responsive desde 360px sin scroll horizontal */
+    @media (max-width: 768px) {
+      .table-wrap--agenda {
+        display: none;
+      }
+      .agenda-cards {
+        display: flex;
+      }
+      .btn {
+        width: 100%;
+      }
+      .actions-row .btn {
+        width: 100%;
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE SIMULACIÓN DE ESTADOS Y ROLES (Para pruebas del prototipo) -->
+  <aside class="proto-toolbar" aria-label="Controles de simulación del prototipo">
+    <div class="proto-toolbar__group">
+      <span class="proto-badge">PROTOTIPO v0.1</span>
+      <label for="sim-role"><strong>Rol activo:</strong></label>
+      <select id="sim-role" class="proto-select">
+        <option value="empleada" selected>Empleada (Milena Bermúdez)</option>
+        <option value="gerente">Gerente (Vicky Beltrán)</option>
+        <option value="tecnico">Técnico (Vista móvil / campo)</option>
+        <option value="none">Sin sesión (P-01)</option>
+      </select>
+    </div>
+
+    <div class="proto-toolbar__group">
+      <label for="sim-state"><strong>Estado de red / servicio:</strong></label>
+      <select id="sim-state" class="proto-select">
+        <option value="normal" selected>Normal (Conectado)</option>
+        <option value="empty">Agenda vacía hoy (MSG-02)</option>
+        <option value="loading">Cargando datos...</option>
+        <option value="service_error">Error de servicio (MSG-05 / MSG-10 / MSG-15)</option>
+        <option value="offline">Sin conexión (MSG-23)</option>
+      </select>
+      <button type="button" id="btn-reset-demo" class="proto-btn">Restablecer datos demo</button>
+    </div>
+  </aside>
+
+  <!-- ENCABEZADO DE APLICACIÓN -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <div>
+          <div class="brand__title">SIGCortinas</div>
+          <div class="brand__sub">Cortinas Ambiente Moderno · Gestión operativa</div>
+        </div>
+      </div>
+
+      <div class="user-session" id="session-header-info">
+        <span class="role-pill" id="active-user-label">Rol: Empleada · Milena Bermúdez</span>
+        <button type="button" id="btn-logout" class="btn btn-secondary">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- MENÚ DE NAVEGACIÓN INTERNA (P-02 a P-11 según rol) -->
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
+      <ul class="main-nav__list" id="nav-list">
+        <!-- Se genera dinámicamente según el rol -->
+      </ul>
+    </nav>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-container" id="main-content" tabindex="-1">
+
+    <!-- BANNER GLOBAL DE NOTIFICACIONES / CORREOS M-01 / M-02 -->
+    <div id="global-feedback" aria-live="polite"></div>
+
+    <!-- ========================================================================
+         P-01 · INICIAR SESIÓN (REQ-NF-02 · MSG-01)
+         ======================================================================== -->
+    <section id="screen-P01" class="screen" aria-labelledby="title-P01">
+      <div style="max-width: 460px; margin: 0 auto;">
+        <div class="panel">
+          <h1 id="title-P01">Iniciar sesión</h1>
+          <p>Ingrese sus credenciales internas de SIGCortinas para acceder según su rol.</p>
+
+          <div id="p01-feedback" aria-live="polite"></div>
+
+          <form id="form-login" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="login-user">Usuario <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="text" id="login-user" name="usuario" autocomplete="username" placeholder="Ej. milena, vicky o tecnico" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-pass">Contraseña <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="password" id="login-pass" name="contrasena" autocomplete="current-password" required />
+              <span class="help-text">Cuentas de prueba: <strong>milena</strong> (Empleada), <strong>vicky</strong> (Gerente), <strong>tecnico</strong> (Técnico). Contraseña: <strong>1234</strong>.</span>
+            </div>
+
+            <div class="actions-row">
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Iniciar sesión</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         P-02 · AGENDA DEL DÍA (CU-03 · REQ-F-02, REQ-F-02a, REQ-F-10)
+         ======================================================================== -->
+    <section id="screen-P02" class="screen" aria-labelledby="title-P02">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P02">Agenda del día · <span id="p02-date-label">24/11/2026</span></h1>
+          <p id="p02-role-subtitle">Actividades programadas ordenadas por hora.</p>
+        </div>
+        <div class="actions-row" style="margin-top: 0;" id="p02-primary-actions">
+          <button type="button" class="btn btn-primary" data-nav="P03">+ Nuevo pedido</button>
+          <button type="button" class="btn btn-secondary" data-nav="P04">Agendar visita</button>
+        </div>
+      </div>
+
+      <!-- Alertas operativas (CU-03 ext. 2b y 2c) -->
+      <div id="p02-alerts" aria-live="polite"></div>
+
+      <!-- Filtro por Técnico (Visible para Gerente y Empleada; oculto para Técnico) -->
+      <div class="panel panel--soft" id="p02-filter-box">
+        <div class="grid-2" style="align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="p02-tech-filter">Filtrar agenda por Técnico</label>
+            <select id="p02-tech-filter" class="form-control">
+              <option value="ALL">Todos los técnicos</option>
+              <option value="Carlos Méndez">Carlos Méndez</option>
+              <option value="Andrés Rojas">Andrés Rojas</option>
+            </select>
+          </div>
+          <div>
+            <span class="help-text">Seleccione una actividad del listado para abrir el detalle de la visita (P-05).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor de estado (Cargando / Error servicio / Vacío / Tabla + Tarjetas) -->
+      <div id="p02-state-banner" aria-live="polite"></div>
+
+      <div id="p02-content-area">
+        <!-- Vista de escritorio: Tabla -->
+        <div class="table-wrap table-wrap--agenda">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Hora</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Tipo de visita</th>
+                <th scope="col">Dirección</th>
+                <th scope="col">Técnico</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="p02-table-body">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Vista móvil (360px): Tarjetas -->
+        <div class="agenda-cards" id="p02-cards-body">
+          <!-- Tarjetas dinámicas -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         P-03 · NUEVO PEDIDO (CU-01N · REQ-F-04a, REQ-F-04b)
+         ======================================================================== -->
+    <section id="screen-P03" class="screen" aria-labelledby="title-P03">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P03">Nuevo pedido</h1>
+          <p>Registre los datos del cliente, las especificaciones técnicas y el abono inicial del 50 %.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <p class="help-text" style="margin-bottom: var(--sp-3);">Los campos marcados con <span class="req-mark" aria-hidden="true">*</span> son obligatorios según el Apéndice B del SRS.</p>
+
+      <!-- Resumen de errores (MSG-06 / MSG-07) o estado de red (MSG-10 / MSG-23) -->
+      <div id="p03-feedback" aria-live="polite"></div>
+
+      <form id="form-new-order" novalidate>
+        <!-- Grupo 1: Datos del cliente -->
+        <fieldset class="panel" style="border: 1px solid var(--color-borde);">
+          <legend style="font-weight: 700; padding: 0 var(--sp-2);">1. Datos del cliente</legend>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="ord-client-phone">Teléfono del cliente <span class="req-mark" aria-hidden="true">*</span></label>
+              <div style="display: flex; gap: var(--sp-2); flex-wrap: wrap;">
+                <input class="form-control" style="flex: 1; min-width: 180px;" type="tel" id="ord-client-phone" name="telefono" placeholder="Ej. 3104567890" required />
+                <button type="button" id="btn-search-client" class="btn btn-secondary">Buscar cliente existente</button>
+              </div>
+              <span class="help-text">Pruebe buscar <strong>3104567890</strong> o <strong>3209876543</strong> para autocompletar.</span>
+              <div id="err-ord-client-phone" class="field-error" hidden></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ord-client-name">Nombre completo del cliente <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="text" id="ord-client-name" name="nombre" placeholder="Ej. Martha Lucía Pérez" required />
+              <div id="err-ord-client-name" class="field-error" hidden></div>
+            </div>
+          </div>
+          <div id="p03-client-search-msg" aria-live="polite"></div>
+        </fieldset>
+
+        <!-- Grupo 2: Producto o servicio y medidas -->
+        <fieldset class="panel" style="border: 1px solid var(--color-borde);">
+          <legend style="font-weight: 700; padding: 0 var(--sp-2);">2. Producto o servicio y medidas</legend>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="ord-product-type">Tipo de producto o servicio <span class="req-mark" aria-hidden="true">*</span></label>
+              <select class="form-control" id="ord-product-type" name="tipoProducto" required>
+                <option value="">Seleccione una opción</option>
+                <option value="Cortina Enrollable Blackout">Cortina Enrollable Blackout</option>
+                <option value="Persiana Sheer Elegance">Persiana Sheer Elegance</option>
+                <option value="Panel Japonés">Panel Japonés</option>
+                <option value="Cortina Tradicional en Tela">Cortina Tradicional en Tela</option>
+                <option value="Motorización y Automatización">Motorización y Automatización</option>
+              </select>
+              <div id="err-ord-product-type" class="field-error" hidden></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ord-specs">Medidas y especificaciones técnicas <span class="req-mark" aria-hidden="true">*</span></label>
+              <textarea class="form-control" id="ord-specs" name="especificaciones" placeholder="Ej. Sala: 2,40 m ancho x 2,20 m alto, tela lino beige, mando derecho." required></textarea>
+              <div id="err-ord-specs" class="field-error" hidden></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Grupo 3: Valor total y abono inicial -->
+        <fieldset class="panel" style="border: 1px solid var(--color-borde);">
+          <legend style="font-weight: 700; padding: 0 var(--sp-2);">3. Valor total y abono inicial</legend>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="ord-total">Valor total acordado (COP) <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="number" id="ord-total" name="valorTotal" min="1" step="1" placeholder="Ej. 850000" required />
+              <span class="help-text">Debe ser un valor positivo en pesos colombianos.</span>
+              <div id="err-ord-total" class="field-error" hidden></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ord-deposit">Abono inicial (COP) <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="number" id="ord-deposit" name="abonoInicial" min="1" step="1" placeholder="Ej. 425000" required />
+              <span class="help-text" id="help-ord-deposit">El abono inicial corresponde al 50 % del valor total, redondeado al peso superior.</span>
+              <div id="err-ord-deposit" class="field-error" hidden></div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Grupo 4: Resumen previo antes de confirmar -->
+        <section class="panel panel--summary" aria-labelledby="ord-summary-title">
+          <h2 id="ord-summary-title" style="font-size: 1.125rem;">4. Resumen del pedido (verificación previa)</h2>
+          <dl class="kv-list">
+            <div class="kv-item">
+              <dt>Cliente</dt>
+              <dd id="sum-ord-client">Sin diligenciar</dd>
+            </div>
+            <div class="kv-item">
+              <dt>Producto / servicio</dt>
+              <dd id="sum-ord-product">Sin seleccionar</dd>
+            </div>
+            <div class="kv-item">
+              <dt>Valor total</dt>
+              <dd id="sum-ord-total">$0</dd>
+            </div>
+            <div class="kv-item">
+              <dt>Abono inicial (50 %)</dt>
+              <dd id="sum-ord-deposit">$0</dd>
+            </div>
+            <div class="kv-item">
+              <dt>Saldo pendiente estimado</dt>
+              <dd id="sum-ord-balance">$0</dd>
+            </div>
+          </dl>
+        </section>
+
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary" id="btn-submit-order">Confirmar pedido</button>
+          <button type="button" class="btn btn-secondary" data-nav="P02">Cancelar y volver</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========================================================================
+         P-04 · AGENDAR VISITA (CU-02 · REQ-F-01a, REQ-F-01b, REQ-F-01c · M-01)
+         ======================================================================== -->
+    <section id="screen-P04" class="screen" aria-labelledby="title-P04">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P04">Agendar visita</h1>
+          <p>Programe una visita de medición o instalación verificando la disponibilidad del Técnico.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <div id="p04-feedback" aria-live="polite"></div>
+
+      <form id="form-schedule-visit" novalidate>
+        <!-- Grupo 1: Cliente y dirección -->
+        <fieldset class="panel" style="border: 1px solid var(--color-borde);">
+          <legend style="font-weight: 700; padding: 0 var(--sp-2);">1. Datos del cliente y ubicación</legend>
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label" for="vis-client">Nombre del cliente <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="text" id="vis-client" required placeholder="Ej. Jorge Enrique Castro" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vis-phone">Teléfono <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="tel" id="vis-phone" required placeholder="Ej. 3152223344" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vis-address">Dirección o ubicación <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="text" id="vis-address" required placeholder="Ej. Calle 24 # 10-45, Tunja" />
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Grupo 2: Datos de la visita y duración estimada -->
+        <fieldset class="panel" style="border: 1px solid var(--color-borde);">
+          <legend style="font-weight: 700; padding: 0 var(--sp-2);">2. Tipo de visita, fecha, hora y Técnico</legend>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="vis-type">Tipo de visita <span class="req-mark" aria-hidden="true">*</span></label>
+              <select class="form-control" id="vis-type" required>
+                <option value="Medición urbana (1 h)" data-hours="1">Medición urbana (1 hora)</option>
+                <option value="Instalación urbana (2 h)" data-hours="2">Instalación urbana (2 horas)</option>
+                <option value="Visita en finca cercana (< 30 min · 4 h)" data-hours="4">Visita en finca cercana (&lt; 30 min · 4 horas)</option>
+                <option value="Visita en finca lejana (> 30 min · 8 h)" data-hours="8">Visita en finca lejana (&gt; 30 min · 8 horas)</option>
+              </select>
+              <span class="help-text">Para visitas en finca, la duración es de 4 h (&lt; 30 min) u 8 h (&gt; 30 min), según REQ-F-01c.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vis-tech">Técnico asignado <span class="req-mark" aria-hidden="true">*</span></label>
+              <select class="form-control" id="vis-tech" required>
+                <option value="Carlos Méndez">Carlos Méndez</option>
+                <option value="Andrés Rojas">Andrés Rojas</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vis-date">Fecha de la visita <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="date" id="vis-date" value="2026-11-24" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="vis-time">Hora de inicio (formato 24 h) <span class="req-mark" aria-hidden="true">*</span></label>
+              <input class="form-control" type="time" id="vis-time" value="10:30" required />
+              <span class="help-text">Pruebe <strong>24/11/2026 a las 10:30</strong> con Carlos Méndez para simular un cruce de horario (MSG-11).</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="vis-notes">Observaciones del trabajo (REQ-F-01b)</label>
+            <textarea class="form-control" id="vis-notes" placeholder="Ej. Llevar muestrario de telas blackout y escalera de 3 metros."></textarea>
+          </div>
+
+          <!-- Banda informativa MSG-13: Duración estimada -->
+          <div class="banner banner--info" role="status">
+            <span class="banner__icon" aria-hidden="true">ℹ</span>
+            <div class="banner__body">
+              <span class="banner__title">Duración estimada calculada (MSG-13)</span>
+              <span id="p04-duration-msg">La duración estimada de esta visita es de 1 hora (franja 10:30 a 11:30).</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Panel de cruce y franjas libres sugeridas (MSG-11 / MSG-12) -->
+        <div id="p04-conflict-panel" hidden></div>
+
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary" id="btn-submit-visit">Confirmar agendamiento</button>
+          <button type="button" class="btn btn-secondary" data-nav="P02">Cancelar y volver</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========================================================================
+         P-05 · DETALLE DE LA VISITA (CU-03, CU-04 · REQ-F-02, REQ-F-03 · M-02)
+         ======================================================================== -->
+    <section id="screen-P05" class="screen" aria-labelledby="title-P05">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P05">Detalle de la visita</h1>
+          <p id="p05-subtitle">Información completa de la actividad seleccionada en la agenda compartida.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <div id="p05-feedback" aria-live="polite"></div>
+
+      <div class="panel" id="p05-detail-card">
+        <!-- Se llena dinámicamente con la visita seleccionada -->
+      </div>
+
+      <!-- Sección integrada de Reprogramar o Cancelar (CU-04 · Solo Empleada) -->
+      <div class="panel panel--soft" id="p05-reschedule-section" hidden>
+        <h2>Reprogramar o cancelar cita (CU-04)</h2>
+        <p>Al confirmar, la agenda compartida se actualizará y se enviará notificación por correo (M-02) al Técnico y a la Gerente.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="p05-action-type">Tipo de modificación <span class="req-mark" aria-hidden="true">*</span></label>
+          <select id="p05-action-type" class="form-control">
+            <option value="reprogramar">Reprogramar fecha y hora</option>
+            <option value="cancelar">Cancelar cita</option>
+          </select>
+        </div>
+
+        <div id="p05-new-datetime-fields" class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="p05-new-date">Nueva fecha <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="date" id="p05-new-date" class="form-control" value="2026-11-25" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="p05-new-time">Nueva hora <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="time" id="p05-new-time" class="form-control" value="14:00" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="p05-reason">Motivo del cambio o cancelación <span class="req-mark" aria-hidden="true">*</span></label>
+          <textarea id="p05-reason" class="form-control" placeholder="Ej. El cliente solicitó trasladar la visita por cruce laboral."></textarea>
+        </div>
+
+        <div class="actions-row">
+          <button type="button" id="btn-confirm-p05-change" class="btn btn-primary">Confirmar modificación de cita</button>
+          <button type="button" id="btn-close-p05-change" class="btn btn-secondary">Cerrar sin cambios</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         P-06 · REGISTRAR RESULTADO DE VISITA (CU-10 · REQ-F-11 · Solo Técnico)
+         ======================================================================== -->
+    <section id="screen-P06" class="screen" aria-labelledby="title-P06">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P06">Registrar resultado de visita</h1>
+          <p>Reporte la ejecución técnica en campo o informe si el cliente estuvo ausente.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btn-back-to-p05">Volver al detalle de la visita</button>
+      </div>
+
+      <div id="p06-feedback" aria-live="polite"></div>
+
+      <div class="panel panel--soft" id="p06-visit-summary"></div>
+
+      <form id="form-visit-result" class="panel" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="res-outcome">Resultado de la visita <span class="req-mark" aria-hidden="true">*</span></label>
+          <select id="res-outcome" class="form-control">
+            <option value="Realizada">Realizada satisfactoriamente</option>
+            <option value="No realizada">No realizada (Cliente ausente)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="res-measures-group">
+          <label class="form-label" for="res-measures">Medidas tomadas o confirmación de instalación <span class="req-mark" aria-hidden="true">*</span></label>
+          <textarea id="res-measures" class="form-control" placeholder="Ej. Ventana alcoba principal: 1,85 m ancho x 2,10 m alto. Instalación a techo."></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="res-end-time">Hora de finalización <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="time" id="res-end-time" class="form-control" value="11:00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="res-notes">Observaciones adicionales</label>
+            <input type="text" id="res-notes" class="form-control" placeholder="Ej. Sin novedades / Cliente ausente tras 15 min de espera." />
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary">Confirmar resultado de visita</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========================================================================
+         P-07 · REGISTRAR PAGO (CU-05 · Empleada)
+         ======================================================================== -->
+    <section id="screen-P07" class="screen" aria-labelledby="title-P07">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P07">Registrar pago de saldo</h1>
+          <p>Busque un pedido pendiente para registrar abonos o cancelar el saldo total.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <div id="p07-feedback" aria-live="polite"></div>
+
+      <div class="panel panel--soft">
+        <div class="grid-2" style="align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="p07-search-input">Número de pedido o teléfono del cliente</label>
+            <input type="text" id="p07-search-input" class="form-control" placeholder="Ej. PED-1042 o 3104567890" />
+          </div>
+          <div>
+            <button type="button" id="btn-p07-search" class="btn btn-primary">Buscar pedido</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="p07-order-card" hidden></div>
+    </section>
+
+    <!-- ========================================================================
+         P-08 · INVENTARIO (CU-06 · REQ-F-06 · MSG-19, MSG-20)
+         ======================================================================== -->
+    <section id="screen-P08" class="screen" aria-labelledby="title-P08">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P08">Inventario</h1>
+          <p>Consulte existencias disponibles por nombre, referencia, tipo de tela o color.</p>
+        </div>
+        <div class="actions-row" style="margin-top: 0;" id="p08-gerente-actions"></div>
+      </div>
+
+      <div class="panel panel--soft">
+        <form id="form-inv-search" class="grid-2" style="align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="inv-query">Criterio de búsqueda</label>
+            <input type="text" id="inv-query" class="form-control" placeholder="Ej. Blackout, Lino, REF-02, Beige..." />
+          </div>
+          <div style="display: flex; gap: var(--sp-2); flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="button" id="btn-inv-clear" class="btn btn-secondary">Ver todo</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="p08-feedback" aria-live="polite"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Referencia</th>
+              <th scope="col">Artículo</th>
+              <th scope="col">Tipo / Color</th>
+              <th scope="col">Existencia</th>
+              <th scope="col">Última actualización</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="p08-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         P-09 · INGRESO DE MERCANCÍA (CU-07 · Solo Gerente)
+         ======================================================================== -->
+    <section id="screen-P09" class="screen" aria-labelledby="title-P09">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P09">Ingreso de mercancía</h1>
+          <p>Registre la llegada de insumos o pedidos de fábrica para actualizar el inventario.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P08">Ir a Inventario</button>
+      </div>
+
+      <div id="p09-feedback" aria-live="polite"></div>
+
+      <form id="form-stock-in" class="panel" novalidate>
+        <div class="grid-3">
+          <div class="form-group">
+            <label class="form-label" for="in-supplier">Proveedor / Fábrica <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="text" id="in-supplier" class="form-control" value="Textiles y Persianas del Norte S.A.S." required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-date">Fecha de recepción <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="date" id="in-date" class="form-control" value="2026-11-24" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-ref">Referencia de remisión <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="text" id="in-ref" class="form-control" placeholder="Ej. REM-8841" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="in-item">Artículo recibido <span class="req-mark" aria-hidden="true">*</span></label>
+            <select id="in-item" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="in-qty">Cantidad recibida <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="number" id="in-qty" class="form-control" min="1" step="1" placeholder="Ej. 25" required />
+          </div>
+        </div>
+
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary">Confirmar ingreso de mercancía</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========================================================================
+         P-10 · HISTORIAL DE CLIENTES (CU-08 · REQ-NF-01)
+         ======================================================================== -->
+    <section id="screen-P10" class="screen" aria-labelledby="title-P10">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P10">Historial de clientes</h1>
+          <p>Busque compras y pedidos anteriores por nombre o teléfono del cliente.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <div class="panel panel--soft">
+        <form id="form-hist-search" class="grid-2" style="align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="hist-query">Nombre o teléfono del cliente</label>
+            <input type="text" id="hist-query" class="form-control" placeholder="Ej. Martha, Carlos, 3104567890..." />
+          </div>
+          <div style="display: flex; gap: var(--sp-2); flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">Buscar historial</button>
+            <button type="button" id="btn-hist-all" class="btn btn-secondary">Mostrar todos</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Pedido</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Producto / Especificación</th>
+              <th scope="col">Total / Saldo</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Garantía</th>
+            </tr>
+          </thead>
+          <tbody id="p10-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         P-11 · GARANTÍAS (CU-09 · REQ-F-10, REQ-NF-03 · MSG-04, MSG-21)
+         ======================================================================== -->
+    <section id="screen-P11" class="screen" aria-labelledby="title-P11">
+      <div class="screen-header">
+        <div>
+          <h1 id="title-P11">Garantías</h1>
+          <p>Controle las garantías enviadas a fábrica (plazo estándar de 12 días calendario) y registre nuevos envíos.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" data-nav="P02">Volver a Agenda del día</button>
+      </div>
+
+      <div id="p11-feedback" aria-live="polite"></div>
+
+      <!-- Listado de garantías actuales -->
+      <div class="panel">
+        <h2>Garantías registradas en seguimiento</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Ref. Garantía</th>
+                <th scope="col">Pedido</th>
+                <th scope="col">Cliente / Artículo</th>
+                <th scope="col">Envío a fábrica</th>
+                <th scope="col">Días transcurridos</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="p11-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Formulario de registro de garantía -->
+      <form id="form-new-warranty" class="panel panel--soft" novalidate>
+        <h2>Registrar nueva garantía enviada a fábrica</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label" for="war-order">Pedido de origen <span class="req-mark" aria-hidden="true">*</span></label>
+            <select id="war-order" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="war-ref">Referencia caso fábrica <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="text" id="war-ref" class="form-control" placeholder="Ej. GAR-2026-09" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="war-date">Fecha de envío a fábrica <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="date" id="war-date" class="form-control" value="2026-11-24" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="war-reason">Motivo de garantía <span class="req-mark" aria-hidden="true">*</span></label>
+            <input type="text" id="war-reason" class="form-control" placeholder="Ej. Desperfecto en mecanismo de cadena" required />
+          </div>
+        </div>
+        <div class="actions-row">
+          <button type="submit" class="btn btn-primary">Confirmar registro de garantía</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    SIGCortinas · Prototipo interactivo v0.1 (Ingeniería de Requisitos · Unidad 6) · Cortinas Ambiente Moderno, Tunja.
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       DATOS INICIALES DEL PROTOTIPO (Basados en el dominio de SIGCortinas)
+       ========================================================================== */
+    const TODAY_STR = "2026-11-24";
+    const TODAY_DISPLAY = "24/11/2026";
+
+    const ROLES_CONFIG = {
+      empleada: {
+        name: "Empleada · Milena Bermúdez",
+        shortRole: "Empleada",
+        allowedScreens: ["P02", "P03", "P04", "P05", "P07", "P08", "P10"],
+        navItems: [
+          { id: "P02", label: "Inicio" },
+          { id: "P03", label: "Nuevo pedido" },
+          { id: "P04", label: "Agendar visita" },
+          { id: "P07", label: "Registrar pago" },
+          { id: "P08", label: "Inventario" },
+          { id: "P10", label: "Historial de clientes" }
+        ]
+      },
+      gerente: {
+        name: "Gerente · Vicky Beltrán",
+        shortRole: "Gerente",
+        allowedScreens: ["P02", "P05", "P08", "P09", "P10", "P11"],
+        navItems: [
+          { id: "P02", label: "Inicio" },
+          { id: "P08", label: "Inventario" },
+          { id: "P09", label: "Ingreso de mercancía" },
+          { id: "P10", label: "Historial de clientes" },
+          { id: "P11", label: "Garantías" }
+        ]
+      },
+      tecnico: {
+        name: "Técnico · Carlos Méndez",
+        shortRole: "Técnico",
+        techName: "Carlos Méndez",
+        allowedScreens: ["P02", "P05", "P06"],
+        navItems: [
+          { id: "P02", label: "Inicio (Mis visitas)" }
+        ]
+      },
+      none: {
+        name: "Sin sesión",
+        shortRole: "Invitado",
+        allowedScreens: ["P01"],
+        navItems: []
+      }
+    };
+
+    function getInitialData() {
+      return {
+        clients: [
+          { phone: "3104567890", name: "Martha Lucía Pérez", address: "Calle 24 # 10-45, Barrio Santa Inés, Tunja" },
+          { phone: "3209876543", name: "Carlos Alberto Gómez", address: "Carrera 11 # 18-20, Centro, Tunja" },
+          { phone: "3115558899", name: "Diana Carolina Ruiz", address: "Conjunto Los Álamos Casa 12, Tunja" },
+          { phone: "3147771122", name: "Finca El Mirador (Hernán Díaz)", address: "Vereda Runta, Km 4 vía Paipa" }
+        ],
+        visits: [
+          {
+            id: "VIS-01",
+            date: "2026-11-24",
+            time: "08:30",
+            endTime: "09:30",
+            durationHours: 1,
+            client: "Martha Lucía Pérez",
+            phone: "3104567890",
+            type: "Medición urbana (1 h)",
+            address: "Calle 24 # 10-45, Barrio Santa Inés",
+            tech: "Carlos Méndez",
+            status: "Programada",
+            confirmed: true,
+            notes: "Medir 3 ventanas en sala y alcoba principal. Llevar catálogo de telas sheer.",
+            orderRef: "PED-1042",
+            pendingBalance: 425000
+          },
+          {
+            id: "VIS-02",
+            date: "2026-11-24",
+            time: "10:00",
+            endTime: "12:00",
+            durationHours: 2,
+            client: "Carlos Alberto Gómez",
+            phone: "3209876543",
+            type: "Instalación urbana (2 h)",
+            address: "Carrera 11 # 18-20, Centro",
+            tech: "Carlos Méndez",
+            status: "Programada",
+            confirmed: false, // Genera alerta Por confirmar (REQ-F-02a)
+            notes: "Instalación de 2 persianas enrollables motorizadas. Verificar punto eléctrico.",
+            orderRef: "PED-1043",
+            pendingBalance: 600000
+          },
+          {
+            id: "VIS-03",
+            date: "2026-11-24",
+            time: "14:00",
+            endTime: "16:00",
+            durationHours: 2,
+            client: "Diana Carolina Ruiz",
+            phone: "3115558899",
+            type: "Instalación urbana (2 h)",
+            address: "Conjunto Los Álamos Casa 12",
+            tech: "Andrés Rojas",
+            status: "Programada",
+            confirmed: true,
+            notes: "Panel japonés de 4 telones en comedor.",
+            orderRef: "PED-1044",
+            pendingBalance: 0
+          },
+          {
+            id: "VIS-04",
+            date: "2026-11-26",
+            time: "09:00",
+            endTime: "13:00",
+            durationHours: 4,
+            client: "Finca El Mirador (Hernán Díaz)",
+            phone: "3147771122",
+            type: "Visita en finca cercana (< 30 min · 4 h)",
+            address: "Vereda Runta, Km 4 vía Paipa",
+            tech: "Carlos Méndez",
+            status: "Programada",
+            confirmed: true,
+            notes: "Medición de ventanales en casa campestre.",
+            orderRef: "PED-1041",
+            pendingBalance: 950000
+          }
+        ],
+        orders: [
+          {
+            id: "PED-1044",
+            date: "18/11/2026",
+            client: "Diana Carolina Ruiz",
+            phone: "3115558899",
+            product: "Panel Japonés",
+            specs: "Comedor 3,10 m x 2,30 m, tela screen 5 %",
+            total: 1200000,
+            paid: 1200000,
+            status: "Pagado"
+          },
+          {
+            id: "PED-1043",
+            date: "20/11/2026",
+            client: "Carlos Alberto Gómez",
+            phone: "3209876543",
+            product: "Cortina Enrollable Blackout",
+            specs: "2 unidades motorizadas gris perla",
+            total: 1200000,
+            paid: 600000,
+            status: "Pendiente"
+          },
+          {
+            id: "PED-1042",
+            date: "22/11/2026",
+            client: "Martha Lucía Pérez",
+            phone: "3104567890",
+            product: "Persiana Sheer Elegance",
+            specs: "Sala 2,40 m x 2,20 m, tono marfil",
+            total: 850000,
+            paid: 425000,
+            status: "Pendiente"
+          },
+          {
+            id: "PED-1041",
+            date: "10/11/2026",
+            client: "Finca El Mirador (Hernán Díaz)",
+            phone: "3147771122",
+            product: "Cortina Tradicional en Tela",
+            specs: "5 ventanales lino crudo",
+            total: 1900000,
+            paid: 950000,
+            status: "Pendiente"
+          }
+        ],
+        inventory: [
+          { ref: "REF-01", name: "Tela Blackout Térmico", typeColor: "Blackout · Blanco Hueso", qty: 42, unit: "metros", updated: "23/11/2026" },
+          { ref: "REF-02", name: "Tela Sheer Elegance", typeColor: "Sheer · Marfil", qty: 6, unit: "metros", updated: "22/11/2026" },
+          { ref: "REF-03", name: "Lino Pesado Decorativo", typeColor: "Tela · Beige Natural", qty: 0, unit: "rollos", updated: "21/11/2026" },
+          { ref: "REF-04", name: "Tubo Aluminio 38 mm", typeColor: "Herraje · Anodizado", qty: 18, unit: "unidades", updated: "24/11/2026" },
+          { ref: "REF-05", name: "Motor Tubular 110V", typeColor: "Automatización · Blanco", qty: 3, unit: "unidades", updated: "20/11/2026" }
+        ],
+        warranties: [
+          {
+            id: "GAR-2026-07",
+            orderId: "PED-1041",
+            client: "Finca El Mirador (Hernán Díaz)",
+            product: "Cortina Tradicional en Tela",
+            sentDate: "09/11/2026",
+            daysElapsed: 15, // > 12 días -> Plazo excedido (REQ-F-10 · MSG-04)
+            reason: "Falla en costura lateral de telón principal",
+            status: "En fábrica"
+          },
+          {
+            id: "GAR-2026-08",
+            orderId: "PED-1044",
+            client: "Diana Carolina Ruiz",
+            product: "Panel Japonés",
+            sentDate: "19/11/2026",
+            daysElapsed: 5,
+            reason: "Ajuste de riel deslizante superior",
+            status: "En fábrica"
+          }
+        ]
+      };
+    }
+
+    let appState = {
+      role: "empleada",
+      netState: "normal",
+      currentScreen: "P02",
+      selectedVisitId: "VIS-01",
+      techFilter: "ALL",
+      data: getInitialData()
+    };
+
+    /* ==========================================================================
+       UTILIDADES DE FORMATO Y MENSAJES
+       ========================================================================== */
+    function formatCOP(num) {
+      return "$" + Math.round(num).toLocaleString("es-CO");
+    }
+
+    function formatDisplayDate(isoDate) {
+      if (!isoDate || !isoDate.includes("-")) return isoDate;
+      const [y, m, d] = isoDate.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function addHoursToTime(timeStr, hoursToAdd) {
+      const [h, m] = timeStr.split(":").map(Number);
+      const totalMins = h * 60 + m + Math.round(hoursToAdd * 60);
+      const endH = Math.floor(totalMins / 60) % 24;
+      const endM = totalMins % 60;
+      return `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+    }
+
+    function timeToMinutes(timeStr) {
+      const [h, m] = timeStr.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    // Intervalos semiabiertos [inicio, fin) según Apéndice B
+    function intervalsOverlap(startA, endA, startB, endB) {
+      return startA < endB && startB < endA;
+    }
+
+    function renderBanner(type, icon, title, text, extraHtml = "") {
+      return `
+        <div class="banner banner--${type}" role="${type === 'error' ? 'alert' : 'status'}">
+          <span class="banner__icon" aria-hidden="true">${icon}</span>
+          <div class="banner__body">
+            ${title ? `<span class="banner__title">${title}</span>` : ""}
+            <div>${text}</div>
+            ${extraHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function clearGlobalFeedback() {
+      document.getElementById("global-feedback").innerHTML = "";
+    }
+
+    function showGlobalFeedback(html) {
+      const box = document.getElementById("global-feedback");
+      box.innerHTML = html;
+      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    /* ==========================================================================
+       NAVEGACIÓN Y CONTROL DE ACCESO POR ROL (REQ-NF-02 · MSG-22)
+       ========================================================================== */
+    function navigateTo(screenId, preserveGlobal = false) {
+      if (!preserveGlobal) clearGlobalFeedback();
+
+      const roleCfg = ROLES_CONFIG[appState.role];
+
+      if (appState.role === "none" && screenId !== "P01") {
+        screenId = "P01";
+      } else if (appState.role !== "none" && screenId !== "P01" && !roleCfg.allowedScreens.includes(screenId)) {
+        // MSG-22: Sin permiso
+        showGlobalFeedback(renderBanner(
+          "error",
+          "✕",
+          "Acceso denegado (MSG-22)",
+          "Su rol no tiene permiso para acceder a esta función."
+        ));
+        return;
+      }
+
+      appState.currentScreen = screenId;
+
+      document.querySelectorAll(".screen").forEach(sec => {
+        sec.classList.remove("is-active");
+      });
+      const target = document.getElementById("screen-" + screenId);
+      if (target) target.classList.add("is-active");
+
+      renderNavigation();
+      renderCurrentScreen();
+      document.getElementById("main-content").focus();
+    }
+
+    function renderNavigation() {
+      const roleCfg = ROLES_CONFIG[appState.role];
+      const headerSession = document.getElementById("session-header-info");
+      const navBar = document.getElementById("main-nav");
+      const navList = document.getElementById("nav-list");
+
+      if (appState.role === "none") {
+        headerSession.style.display = "none";
+        navBar.style.display = "none";
+        return;
+      }
+
+      headerSession.style.display = "flex";
+      navBar.style.display = "block";
+      document.getElementById("active-user-label").textContent = "Rol: " + roleCfg.name;
+
+      navList.innerHTML = roleCfg.navItems.map(item => {
+        const isCurrent = appState.currentScreen === item.id ||
+          (item.id === "P02" && ["P05", "P06"].includes(appState.currentScreen));
+        return `
+          <li>
+            <button type="button" class="nav-btn" data-nav="${item.id}" ${isCurrent ? 'aria-current="page"' : ""}>
+              ${item.label}
+            </button>
+          </li>
+        `;
+      }).join("");
+    }
+
+    function renderCurrentScreen() {
+      switch (appState.currentScreen) {
+        case "P02": renderP02(); break;
+        case "P03": updateOrderSummary(); break;
+        case "P04": updateVisitDurationDisplay(); break;
+        case "P05": renderP05(); break;
+        case "P06": renderP06(); break;
+        case "P08": renderP08(); break;
+        case "P09": renderP09(); break;
+        case "P10": renderP10(); break;
+        case "P11": renderP11(); break;
+      }
+    }
+
+    /* ==========================================================================
+       P-01 · INICIAR SESIÓN (MSG-01)
+       ========================================================================== */
+    document.getElementById("form-login").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = document.getElementById("login-user").value.trim().toLowerCase();
+      const pass = document.getElementById("login-pass").value.trim();
+      const fb = document.getElementById("p01-feedback");
+
+      const validUsers = {
+        milena: "empleada",
+        empleada: "empleada",
+        vicky: "gerente",
+        gerente: "gerente",
+        tecnico: "tecnico",
+        carlos: "tecnico"
+      };
+
+      if (validUsers[user] && pass === "1234") {
+        fb.innerHTML = "";
+        appState.role = validUsers[user];
+        document.getElementById("sim-role").value = appState.role;
+        navigateTo("P02");
+      } else {
+        // MSG-01
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Error de autenticación (MSG-01)",
+          "No pudimos iniciar sesión con esos datos. Compruebe su usuario y contraseña e inténtelo de nuevo."
+        );
+      }
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", function() {
+      appState.role = "none";
+      document.getElementById("sim-role").value = "none";
+      document.getElementById("login-user").value = "";
+      document.getElementById("login-pass").value = "";
+      document.getElementById("p01-feedback").innerHTML = "";
+      navigateTo("P01");
+    });
+
+    /* ==========================================================================
+       P-02 · AGENDA DEL DÍA (CU-03 · REQ-F-02, REQ-F-02a, REQ-F-10)
+       ========================================================================== */
+    function renderP02() {
+      const role = appState.role;
+      const net = appState.netState;
+      const alertsBox = document.getElementById("p02-alerts");
+      const filterBox = document.getElementById("p02-filter-box");
+      const primaryActions = document.getElementById("p02-primary-actions");
+      const stateBanner = document.getElementById("p02-state-banner");
+      const contentArea = document.getElementById("p02-content-area");
+      const subtitle = document.getElementById("p02-role-subtitle");
+
+      alertsBox.innerHTML = "";
+      stateBanner.innerHTML = "";
+
+      // Control de acciones y filtro según rol
+      if (role === "empleada") {
+        primaryActions.style.display = "flex";
+        filterBox.style.display = "block";
+        subtitle.textContent = "Vista completa de actividades programadas en el local.";
+      } else if (role === "gerente") {
+        primaryActions.style.display = "none";
+        filterBox.style.display = "block";
+        subtitle.textContent = "Supervisión diaria de citas y alertas de garantías.";
+      } else if (role === "tecnico") {
+        primaryActions.style.display = "none";
+        filterBox.style.display = "none";
+        subtitle.textContent = "Sus visitas asignadas para hoy (vista móvil optimizada).";
+      }
+
+      // Simulación de estados de red / servicio
+      if (net === "loading") {
+        contentArea.style.display = "none";
+        stateBanner.innerHTML = renderBanner("info", "⏳", "Cargando agenda…", "Consultando las actividades programadas para hoy.");
+        return;
+      }
+
+      if (net === "service_error") {
+        contentArea.style.display = "none";
+        stateBanner.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Servicio no disponible (MSG-05)",
+          "No pudimos actualizar la agenda. Compruebe la conexión e inténtelo de nuevo."
+        );
+        return;
+      }
+
+      if (net === "offline") {
+        contentArea.style.display = "none";
+        stateBanner.innerHTML = renderBanner(
+          "error",
+          "⚠",
+          "Sin conexión (MSG-23)",
+          "Se perdió la conexión y no recibimos confirmación de actualización de la agenda. Compruebe su red antes de continuar."
+        );
+        return;
+      }
+
+      // Filtrado de visitas del día
+      let todayVisits = appState.data.visits
+        .filter(v => v.date === TODAY_STR && v.status !== "Cancelada")
+        .sort((a, b) => a.time.localeCompare(b.time));
+
+      if (role === "tecnico") {
+        todayVisits = todayVisits.filter(v => v.tech === ROLES_CONFIG.tecnico.techName);
+      } else if (appState.techFilter !== "ALL") {
+        todayVisits = todayVisits.filter(v => v.tech === appState.techFilter);
+      }
+
+      // Alertas: Citas "Por confirmar" (MSG-03) y Garantías "Plazo excedido" (MSG-04)
+      let alertsHtml = "";
+      const unconfirmed = todayVisits.filter(v => !v.confirmed);
+      if (unconfirmed.length > 0) {
+        alertsHtml += renderBanner(
+          "warning",
+          "⚠",
+          `Citas pendientes de confirmación (${unconfirmed.length}) · MSG-03`,
+          `Esta(s) cita(s) están pendientes de confirmación con el cliente: ${unconfirmed.map(u => u.client + " (" + u.time + ")").join(", ")}.`
+        );
+      }
+
+      if (role !== "tecnico") {
+        const overdueWarranties = appState.data.warranties.filter(w => w.status === "En fábrica" && w.daysElapsed > 12);
+        overdueWarranties.forEach(w => {
+          alertsHtml += renderBanner(
+            "warning",
+            "⚠",
+            `Garantía con plazo excedido · MSG-04`,
+            `La garantía ${w.id} (${w.client}) lleva ${w.daysElapsed} días en fábrica: superó el plazo de 12 días. Revise su seguimiento.`
+          );
+        });
+      }
+      alertsBox.innerHTML = alertsHtml;
+
+      // Estado vacío (MSG-02)
+      if (net === "empty" || todayVisits.length === 0) {
+        contentArea.style.display = "none";
+        const futureVisit = appState.data.visits
+          .filter(v => v.date > TODAY_STR && v.status !== "Cancelada")
+          .sort((a, b) => a.date.localeCompare(b.date))[0];
+        const nextDateText = futureVisit ? formatDisplayDate(futureVisit.date) : "sin fecha próxima registrada";
+        stateBanner.innerHTML = renderBanner(
+          "info",
+          "ℹ",
+          "Agenda sin actividades hoy (MSG-02)",
+          `No hay actividades programadas para hoy (${TODAY_DISPLAY}). La próxima visita está prevista para el ${nextDateText}.`
+        );
+        return;
+      }
+
+      // Renderizar tabla y tarjetas móviles
+      contentArea.style.display = "block";
+      const tbody = document.getElementById("p02-table-body");
+      const cardsBody = document.getElementById("p02-cards-body");
+
+      tbody.innerHTML = todayVisits.map(v => {
+        const badges = getVisitStatusBadges(v);
+        return `
+          <tr>
+            <td><strong>${v.time} – ${v.endTime}</strong></td>
+            <td>${v.client}</td>
+            <td>${v.type}</td>
+            <td>${v.address}</td>
+            <td>${v.tech}</td>
+            <td>${badges}</td>
+            <td>
+              <button type="button" class="btn btn-secondary" onclick="openVisitDetail('${v.id}')">
+                Abrir detalle
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      cardsBody.innerHTML = todayVisits.map(v => {
+        const badges = getVisitStatusBadges(v);
+        return `
+          <article class="agenda-card ${!v.confirmed ? 'agenda-card--pending' : ''}">
+            <div class="agenda-card__top">
+              <span class="agenda-card__time">${v.time} – ${v.endTime}</span>
+              <div>${badges}</div>
+            </div>
+            <div><strong>${v.client}</strong></div>
+            <div class="agenda-card__meta">
+              <div><strong>Tipo:</strong> ${v.type}</div>
+              <div><strong>Dirección:</strong> ${v.address}</div>
+              <div><strong>Técnico:</strong> ${v.tech}</div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="openVisitDetail('${v.id}')">
+              Abrir detalle
+            </button>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function getVisitStatusBadges(visit) {
+      let html = "";
+      if (visit.status === "Realizada") {
+        html += `<span class="badge badge--ok">✓ Realizada</span> `;
+      } else if (visit.status === "No realizada") {
+        html += `<span class="badge badge--error">✕ No realizada</span> `;
+      } else {
+        html += `<span class="badge badge--neutral">● Programada</span> `;
+      }
+
+      if (!visit.confirmed && visit.status === "Programada") {
+        html += `<span class="badge badge--warning">⚠ Por confirmar</span>`;
+      }
+      return html;
+    }
+
+    document.getElementById("p02-tech-filter").addEventListener("change", function(e) {
+      appState.techFilter = e.target.value;
+      renderP02();
+    });
+
+    window.openVisitDetail = function(visitId) {
+      appState.selectedVisitId = visitId;
+      navigateTo("P05");
+    };
+
+    /* ==========================================================================
+       P-03 · NUEVO PEDIDO (CU-01N · REQ-F-04a, REQ-F-04b · MSG-06 a MSG-10)
+       ========================================================================== */
+    function updateOrderSummary() {
+      const name = document.getElementById("ord-client-name").value.trim();
+      const phone = document.getElementById("ord-client-phone").value.trim();
+      const prod = document.getElementById("ord-product-type").value;
+      const total = parseFloat(document.getElementById("ord-total").value) || 0;
+      const deposit = parseFloat(document.getElementById("ord-deposit").value) || 0;
+
+      document.getElementById("sum-ord-client").textContent = name ? `${name}${phone ? " (" + phone + ")" : ""}` : "Sin diligenciar";
+      document.getElementById("sum-ord-product").textContent = prod || "Sin seleccionar";
+      document.getElementById("sum-ord-total").textContent = formatCOP(total);
+      document.getElementById("sum-ord-deposit").textContent = formatCOP(deposit);
+      document.getElementById("sum-ord-balance").textContent = formatCOP(Math.max(0, total - deposit));
+
+      if (total > 0) {
+        const expected = Math.ceil(total * 0.5);
+        document.getElementById("help-ord-deposit").textContent =
+          `El abono inicial corresponde al 50 % del valor total, redondeado al peso superior (${formatCOP(expected)} para este total).`;
+      } else {
+        document.getElementById("help-ord-deposit").textContent =
+          "El abono inicial corresponde al 50 % del valor total, redondeado al peso superior.";
+      }
+    }
+
+    ["ord-client-name", "ord-client-phone", "ord-product-type", "ord-total", "ord-deposit"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updateOrderSummary);
+      document.getElementById(id).addEventListener("change", updateOrderSummary);
+    });
+
+    document.getElementById("btn-search-client").addEventListener("click", function() {
+      const phone = document.getElementById("ord-client-phone").value.trim();
+      const msgBox = document.getElementById("p03-client-search-msg");
+      const found = appState.data.clients.find(c => c.phone === phone);
+
+      if (found) {
+        document.getElementById("ord-client-name").value = found.name;
+        updateOrderSummary();
+        msgBox.innerHTML = renderBanner("ok", "✓", "Cliente encontrado", `Se autocompletaron los datos de ${found.name}.`);
+      } else {
+        msgBox.innerHTML = renderBanner(
+          "info",
+          "ℹ",
+          "Sin coincidencias registradas",
+          "No existe un cliente previo con ese teléfono. Puede continuar diligenciando el nombre para registrarlo como cliente nuevo."
+        );
+      }
+    });
+
+    document.getElementById("form-new-order").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const fb = document.getElementById("p03-feedback");
+      fb.innerHTML = "";
+
+      // Validar fallos simulados de servicio / conexión (MSG-10 / MSG-23 · PROP-UI-01)
+      if (appState.netState === "service_error") {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Sin confirmación del servidor (MSG-10 · PROP-UI-01)",
+          "No recibimos confirmación del registro del pedido. Mantenga esta pantalla abierta y compruebe si el pedido quedó guardado antes de enviarlo otra vez. Los datos que escribió siguen visibles aquí."
+        );
+        return;
+      }
+
+      if (appState.netState === "offline") {
+        fb.innerHTML = renderBanner(
+          "error",
+          "⚠",
+          "Sin conexión (MSG-23 · PROP-UI-01)",
+          "Se perdió la conexión y no recibimos confirmación de registro del pedido. Compruebe el estado del registro antes de enviarlo otra vez."
+        );
+        return;
+      }
+
+      // Limpiar errores previos
+      const fields = [
+        { id: "ord-client-phone", label: "Teléfono del cliente" },
+        { id: "ord-client-name", label: "Nombre completo del cliente" },
+        { id: "ord-product-type", label: "Tipo de producto o servicio" },
+        { id: "ord-specs", label: "Medidas y especificaciones técnicas" },
+        { id: "ord-total", label: "Valor total acordado" },
+        { id: "ord-deposit", label: "Abono inicial" }
+      ];
+
+      fields.forEach(f => {
+        document.getElementById(f.id).classList.remove("is-invalid");
+        const errEl = document.getElementById("err-" + f.id);
+        if (errEl) { errEl.hidden = true; errEl.textContent = ""; }
+      });
+
+      const errors = [];
+
+      fields.forEach(f => {
+        const val = document.getElementById(f.id).value.trim();
+        if (!val) {
+          const msg = `Complete el campo ${f.label}; es obligatorio para guardar el pedido.`; // MSG-06
+          errors.push({ id: f.id, text: msg });
+          document.getElementById(f.id).classList.add("is-invalid");
+          const errEl = document.getElementById("err-" + f.id);
+          errEl.textContent = "✕ " + msg;
+          errEl.hidden = false;
+        }
+      });
+
+      const totalVal = parseFloat(document.getElementById("ord-total").value);
+      const depositVal = parseFloat(document.getElementById("ord-deposit").value);
+
+      if (!isNaN(totalVal) && totalVal <= 0) {
+        const msg = "El valor total acordado debe ser mayor a $0.";
+        errors.push({ id: "ord-total", text: msg });
+        document.getElementById("ord-total").classList.add("is-invalid");
+        const errEl = document.getElementById("err-ord-total");
+        errEl.textContent = "✕ " + msg;
+        errEl.hidden = false;
+      }
+
+      if (!isNaN(totalVal) && totalVal > 0 && !isNaN(depositVal)) {
+        const requiredDeposit = Math.ceil(totalVal * 0.5);
+        if (depositVal !== requiredDeposit) {
+          // MSG-07
+          const msg = `El abono inicial debe ser el 50 % del valor total. Para un total de ${formatCOP(totalVal)}, registre ${formatCOP(requiredDeposit)}.`;
+          errors.push({ id: "ord-deposit", text: msg });
+          document.getElementById("ord-deposit").classList.add("is-invalid");
+          const errEl = document.getElementById("err-ord-deposit");
+          errEl.textContent = "✕ " + msg;
+          errEl.hidden = false;
+        }
+      }
+
+      if (errors.length > 0) {
+        const listHtml = `<ul class="error-summary-list">${errors.map(er =>
+          `<li><a href="#${er.id}">${er.text}</a></li>`
+        ).join("")}</ul>`;
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          `No se pudo guardar el pedido: revise ${errors.length} error(es) (MSG-06 / MSG-07)`,
+          "Corrija los campos señalados a continuación. Sus datos digitados se conservan.",
+          listHtml
+        );
+        document.getElementById(errors[0].id).focus();
+        return;
+      }
+
+      // Éxito (MSG-09)
+      const newOrderNum = "PED-" + (1045 + appState.data.orders.length);
+      const clientName = document.getElementById("ord-client-name").value.trim();
+      const clientPhone = document.getElementById("ord-client-phone").value.trim();
+      const prodType = document.getElementById("ord-product-type").value;
+      const specs = document.getElementById("ord-specs").value.trim();
+
+      appState.data.orders.unshift({
+        id: newOrderNum,
+        date: TODAY_DISPLAY,
+        client: clientName,
+        phone: clientPhone,
+        product: prodType,
+        specs: specs,
+        total: totalVal,
+        paid: depositVal,
+        status: totalVal - depositVal === 0 ? "Pagado" : "Pendiente"
+      });
+
+      document.getElementById("form-new-order").reset();
+      document.getElementById("p03-client-search-msg").innerHTML = "";
+      updateOrderSummary();
+
+      navigateTo("P02", true);
+      showGlobalFeedback(renderBanner(
+        "ok",
+        "✓",
+        `Pedido ${newOrderNum} registrado (MSG-09)`,
+        `El pedido de ${clientName} por ${formatCOP(totalVal)} (abono ${formatCOP(depositVal)}) quedó guardado correctamente.`
+      ));
+    });
+
+    /* ==========================================================================
+       P-04 · AGENDAR VISITA (CU-02 · REQ-F-01a/b/c · MSG-11 a MSG-15 · M-01)
+       ========================================================================== */
+    function getSelectedVisitDuration() {
+      const sel = document.getElementById("vis-type");
+      const opt = sel.options[sel.selectedIndex];
+      return parseFloat(opt.getAttribute("data-hours")) || 1;
+    }
+
+    function updateVisitDurationDisplay() {
+      const hours = getSelectedVisitDuration();
+      const startTime = document.getElementById("vis-time").value || "10:30";
+      const endTime = addHoursToTime(startTime, hours);
+      const label = hours === 1 ? "1 hora" : `${hours} horas`;
+      document.getElementById("p04-duration-msg").textContent =
+        `La duración estimada de esta visita es de ${label} (franja propuesta: ${startTime} a ${endTime}).`;
+    }
+
+    document.getElementById("vis-type").addEventListener("change", updateVisitDurationDisplay);
+    document.getElementById("vis-time").addEventListener("change", updateVisitDurationDisplay);
+
+    function findTechnicianConflict(tech, date, startTime, durationHours, excludeVisitId = null) {
+      const reqStart = timeToMinutes(startTime);
+      const reqEnd = reqStart + Math.round(durationHours * 60);
+
+      return appState.data.visits.find(v => {
+        if (v.id === excludeVisitId) return false;
+        if (v.status === "Cancelada") return false;
+        if (v.tech !== tech || v.date !== date) return false;
+        const vStart = timeToMinutes(v.time);
+        const vEnd = timeToMinutes(v.endTime);
+        return intervalsOverlap(reqStart, reqEnd, vStart, vEnd);
+      });
+    }
+
+    function getFreeSlotsNext7Days(tech, baseDateStr, durationHours) {
+      const slots = [];
+      const baseDate = new Date(baseDateStr + "T00:00:00");
+      const candidateStarts = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00"];
+
+      for (let d = 0; d < 7 && slots.length < 5; d++) {
+        const dt = new Date(baseDate);
+        dt.setDate(baseDate.getDate() + d);
+        const iso = dt.toISOString().slice(0, 10);
+
+        for (const st of candidateStarts) {
+          const endMin = timeToMinutes(st) + Math.round(durationHours * 60);
+          if (endMin > 18 * 60) continue; // Jornada laboral hasta 18:00
+          if (!findTechnicianConflict(tech, iso, st, durationHours)) {
+            slots.push({ date: iso, start: st, end: addHoursToTime(st, durationHours) });
+            if (slots.length >= 5) break;
+          }
+        }
+      }
+      return slots;
+    }
+
+    document.getElementById("form-schedule-visit").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const fb = document.getElementById("p04-feedback");
+      const conflictPanel = document.getElementById("p04-conflict-panel");
+      fb.innerHTML = "";
+      conflictPanel.hidden = true;
+
+      if (appState.netState === "service_error") {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Error al comprobar disponibilidad (MSG-15)",
+          "No recibimos confirmación del agendamiento. Consulte la agenda compartida antes de registrar la visita otra vez."
+        );
+        return;
+      }
+
+      if (appState.netState === "offline") {
+        fb.innerHTML = renderBanner(
+          "error",
+          "⚠",
+          "Sin conexión (MSG-23)",
+          "Se perdió la conexión y no recibimos confirmación de agendamiento de visita. Compruebe el estado del registro antes de enviarlo otra vez."
+        );
+        return;
+      }
+
+      const client = document.getElementById("vis-client").value.trim();
+      const phone = document.getElementById("vis-phone").value.trim();
+      const address = document.getElementById("vis-address").value.trim();
+      const type = document.getElementById("vis-type").value;
+      const tech = document.getElementById("vis-tech").value;
+      const date = document.getElementById("vis-date").value;
+      const time = document.getElementById("vis-time").value;
+      const notes = document.getElementById("vis-notes").value.trim();
+      const durationHours = getSelectedVisitDuration();
+
+      if (!client || !phone || !address || !date || !time) {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Campos obligatorios incompletos",
+          "Complete el cliente, teléfono, dirección, fecha y hora para comprobar disponibilidad y agendar."
+        );
+        return;
+      }
+
+      // Verificar cruce de horario (REQ-F-01a · MSG-11)
+      const conflict = findTechnicianConflict(tech, date, time, durationHours);
+      if (conflict) {
+        const freeSlots = getFreeSlotsNext7Days(tech, date, durationHours);
+        if (freeSlots.length > 0) {
+          const slotsButtons = `
+            <div style="margin-top: 8px;"><strong>Franjas libres de ${durationHours} h en los próximos 7 días (haga clic para aplicar):</strong></div>
+            <div class="slot-list">
+              ${freeSlots.map(s => `
+                <button type="button" class="slot-btn" onclick="applyFreeSlot('${s.date}', '${s.start}')">
+                  ${formatDisplayDate(s.date)} · ${s.start} – ${s.end}
+                </button>
+              `).join("")}
+            </div>
+          `;
+          conflictPanel.hidden = false;
+          conflictPanel.innerHTML = renderBanner(
+            "error",
+            "✕",
+            "Cruce de horario detectado (MSG-11)",
+            `El Técnico (${tech}) ya tiene una visita entre ${conflict.time} y ${conflict.endTime}. Elija una franja libre de igual duración.`,
+            slotsButtons
+          );
+        } else {
+          // MSG-12
+          conflictPanel.hidden = false;
+          conflictPanel.innerHTML = renderBanner(
+            "info",
+            "ℹ",
+            "Sin disponibilidad en 7 días (MSG-12)",
+            `No hay una franja libre de ${durationHours} horas para el Técnico en los próximos siete días. Proponga otra fecha para continuar.`
+          );
+        }
+        return;
+      }
+
+      // Guardar visita y generar correo M-01
+      const endTime = addHoursToTime(time, durationHours);
+      const newVisit = {
+        id: "VIS-0" + (appState.data.visits.length + 1),
+        date,
+        time,
+        endTime,
+        durationHours,
+        client,
+        phone,
+        type,
+        address,
+        tech,
+        status: "Programada",
+        confirmed: false,
+        notes: notes || "Sin observaciones adicionales.",
+        orderRef: "Sin pedido vinculado",
+        pendingBalance: 0
+      };
+
+      appState.data.visits.push(newVisit);
+      document.getElementById("form-schedule-visit").reset();
+      document.getElementById("vis-date").value = TODAY_STR;
+      document.getElementById("vis-time").value = "10:30";
+      updateVisitDurationDisplay();
+
+      const emailHtml = `
+        <div class="email-preview">
+          <strong>Correo automático generado · M-01 (Para: ${tech})</strong><br/>
+          <strong>Asunto:</strong> Nueva visita agendada: ${formatDisplayDate(date)} a las ${time}<br/>
+          <strong>Cuerpo:</strong> Hola, ${tech}. Se agendó una visita de ${type} para el ${formatDisplayDate(date)} a las ${time}, en ${address}. Cliente: ${client}. Consulte los detalles en la agenda de SIGCortinas. Este es un mensaje automático; la agenda compartida del sistema es la referencia principal de la cita.
+        </div>
+      `;
+
+      navigateTo("P02", true);
+      showGlobalFeedback(renderBanner(
+        "ok",
+        "✓",
+        "Visita agendada (MSG-14)",
+        `Visita agendada para el ${formatDisplayDate(date)} a las ${time}. La agenda compartida ya está actualizada.`,
+        emailHtml
+      ));
+    });
+
+    window.applyFreeSlot = function(dateStr, timeStr) {
+      document.getElementById("vis-date").value = dateStr;
+      document.getElementById("vis-time").value = timeStr;
+      document.getElementById("p04-conflict-panel").hidden = true;
+      updateVisitDurationDisplay();
+    };
+
+    /* ==========================================================================
+       P-05 · DETALLE DE LA VISITA (CU-03, CU-04 · REQ-F-03 · MSG-16/17/18 · M-02)
+       ========================================================================== */
+    function renderP05() {
+      const visit = appState.data.visits.find(v => v.id === appState.selectedVisitId) || appState.data.visits[0];
+      const card = document.getElementById("p05-detail-card");
+      const resSection = document.getElementById("p05-reschedule-section");
+      document.getElementById("p05-feedback").innerHTML = "";
+      resSection.hidden = true;
+
+      if (!visit) return;
+
+      const role = appState.role;
+      let roleActionsHtml = "";
+
+      if (role === "empleada" && visit.status === "Programada") {
+        roleActionsHtml = `
+          <div class="actions-row">
+            <button type="button" class="btn btn-primary" onclick="openP05Reschedule('reprogramar')">Reprogramar cita</button>
+            <button type="button" class="btn btn-danger-outline" onclick="openP05Reschedule('cancelar')">Cancelar cita</button>
+          </div>
+        `;
+      } else if (role === "tecnico" && visit.status === "Programada" && visit.date === TODAY_STR) {
+        roleActionsHtml = `
+          <div class="actions-row">
+            <button type="button" class="btn btn-primary" onclick="navigateTo('P06')">Registrar resultado de visita</button>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+          <h2 style="margin: 0;">${visit.client} · ${visit.type}</h2>
+          <div>${getVisitStatusBadges(visit)}</div>
+        </div>
+
+        <dl class="kv-list">
+          <div class="kv-item">
+            <dt>Fecha y franja horaria</dt>
+            <dd>${formatDisplayDate(visit.date)} · ${visit.time} a ${visit.endTime}</dd>
+          </div>
+          <div class="kv-item">
+            <dt>Dirección</dt>
+            <dd>${visit.address}</dd>
+          </div>
+          <div class="kv-item">
+            <dt>Teléfono de contacto</dt>
+            <dd>${visit.phone}</dd>
+          </div>
+          <div class="kv-item">
+            <dt>Técnico asignado</dt>
+            <dd>${visit.tech}</dd>
+          </div>
+          <div class="kv-item">
+            <dt>Pedido asociado y saldo</dt>
+            <dd>${visit.orderRef} · Saldo: ${formatCOP(visit.pendingBalance)}</dd>
+          </div>
+        </dl>
+
+        <div class="panel panel--soft" style="margin-top: 16px; margin-bottom: 0;">
+          <strong>Observaciones del trabajo:</strong>
+          <p style="margin: 4px 0 0 0;">${visit.notes}</p>
+        </div>
+
+        ${roleActionsHtml}
+      `;
+    }
+
+    window.openP05Reschedule = function(mode) {
+      const sec = document.getElementById("p05-reschedule-section");
+      const sel = document.getElementById("p05-action-type");
+      sel.value = mode;
+      toggleP05ActionFields();
+      sec.hidden = false;
+      sec.scrollIntoView({ behavior: "smooth" });
+    };
+
+    function toggleP05ActionFields() {
+      const isCancel = document.getElementById("p05-action-type").value === "cancelar";
+      document.getElementById("p05-new-datetime-fields").style.display = isCancel ? "none" : "grid";
+    }
+
+    document.getElementById("p05-action-type").addEventListener("change", toggleP05ActionFields);
+    document.getElementById("btn-close-p05-change").addEventListener("click", () => {
+      document.getElementById("p05-reschedule-section").hidden = true;
+    });
+
+    document.getElementById("btn-confirm-p05-change").addEventListener("click", function() {
+      const visit = appState.data.visits.find(v => v.id === appState.selectedVisitId);
+      const fb = document.getElementById("p05-feedback");
+      const actionType = document.getElementById("p05-action-type").value;
+      const reason = document.getElementById("p05-reason").value.trim();
+
+      if (!reason) {
+        fb.innerHTML = renderBanner("error", "✕", "Motivo obligatorio", "Debe registrar el motivo de la reprogramación o cancelación.");
+        return;
+      }
+
+      const prevDate = formatDisplayDate(visit.date);
+      const prevTime = visit.time;
+
+      if (actionType === "cancelar") {
+        visit.status = "Cancelada";
+        visit.notes += ` [Cancelada: ${reason}]`;
+
+        const emailM02 = `
+          <div class="email-preview">
+            <strong>Correo automático generado · M-02 (Para: ${visit.tech} y Gerente)</strong><br/>
+            <strong>Asunto:</strong> Cambio de cita: ${prevDate} · Cancelada<br/>
+            <strong>Cuerpo:</strong> Hola. La visita de ${visit.client}, prevista para el ${prevDate} a las ${prevTime}, fue cancelada. Motivo registrado: ${reason}. La agenda compartida de SIGCortinas ya fue actualizada. Consulte P-02 para ver el estado actual de la cita. Este es un mensaje automático.
+          </div>
+        `;
+
+        navigateTo("P02", true);
+        showGlobalFeedback(renderBanner(
+          "ok",
+          "✓",
+          "Cita cancelada (MSG-18)",
+          "La visita fue cancelada. El motivo quedó registrado y la agenda compartida se actualizó.",
+          emailM02
+        ));
+        return;
+      }
+
+      // Reprogramación
+      const newDate = document.getElementById("p05-new-date").value;
+      const newTime = document.getElementById("p05-new-time").value;
+
+      if (!newDate || !newTime) {
+        fb.innerHTML = renderBanner("error", "✕", "Fecha y hora requeridas", "Indique la nueva fecha y hora para la visita.");
+        return;
+      }
+
+      // Validar fecha anterior al momento actual (REQ-F-03 · MSG-16)
+      if (newDate < TODAY_STR || (newDate === TODAY_STR && newTime < "08:00")) {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Fecha inválida (MSG-16)",
+          "La nueva fecha no puede ser anterior al momento actual. Elija una fecha y hora actuales o futuras."
+        );
+        return;
+      }
+
+      // Validar cruce con componente compartido (REQ-F-03 · MSG-11)
+      const conflict = findTechnicianConflict(visit.tech, newDate, newTime, visit.durationHours, visit.id);
+      if (conflict) {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Cruce de horario (MSG-11)",
+          `El Técnico ya tiene una visita entre ${conflict.time} y ${conflict.endTime}. Elija una franja libre de igual duración.`
+        );
+        return;
+      }
+
+      visit.date = newDate;
+      visit.time = newTime;
+      visit.endTime = addHoursToTime(newTime, visit.durationHours);
+      visit.notes += ` [Reprogramada: ${reason}]`;
+
+      const newDateDisp = formatDisplayDate(newDate);
+      const emailM02 = `
+        <div class="email-preview">
+          <strong>Correo automático generado · M-02 (Para: ${visit.tech} y Gerente)</strong><br/>
+          <strong>Asunto:</strong> Cambio de cita: ${prevDate} · Reprogramada<br/>
+          <strong>Cuerpo:</strong> Hola. La visita de ${visit.client}, prevista para el ${prevDate} a las ${prevTime}, fue reprogramada para el ${newDateDisp} a las ${newTime}. Motivo registrado: ${reason}. La agenda compartida de SIGCortinas ya fue actualizada. Consulte P-02 para ver el estado actual de la cita. Este es un mensaje automático.
+        </div>
+      `;
+
+      navigateTo("P02", true);
+      showGlobalFeedback(renderBanner(
+        "ok",
+        "✓",
+        "Visita reprogramada (MSG-17)",
+        `La visita se reprogramó para el ${newDateDisp} a las ${newTime}. El motivo quedó registrado y la agenda compartida se actualizó.`,
+        emailM02
+      ));
+    });
+
+    /* ==========================================================================
+       P-06 · REGISTRAR RESULTADO DE VISITA (CU-10 · REQ-F-11 · Técnico)
+       ========================================================================== */
+    function renderP06() {
+      const visit = appState.data.visits.find(v => v.id === appState.selectedVisitId) || appState.data.visits[0];
+      document.getElementById("p06-feedback").innerHTML = "";
+      document.getElementById("p06-visit-summary").innerHTML = `
+        <strong>Visita en curso:</strong> ${visit.client} · ${visit.type} (${visit.time} – ${visit.endTime})<br/>
+        <strong>Dirección:</strong> ${visit.address}
+      `;
+    }
+
+    document.getElementById("btn-back-to-p05").addEventListener("click", () => navigateTo("P05"));
+
+    document.getElementById("res-outcome").addEventListener("change", function(e) {
+      const isAbsent = e.target.value === "No realizada";
+      document.getElementById("res-measures-group").style.display = isAbsent ? "none" : "block";
+    });
+
+    document.getElementById("form-visit-result").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const visit = appState.data.visits.find(v => v.id === appState.selectedVisitId);
+      const outcome = document.getElementById("res-outcome").value;
+      const measures = document.getElementById("res-measures").value.trim();
+      const notes = document.getElementById("res-notes").value.trim();
+      const fb = document.getElementById("p06-feedback");
+
+      if (outcome === "Realizada" && !measures) {
+        fb.innerHTML = renderBanner("error", "✕", "Datos requeridos", "Registre las medidas tomadas o confirmación de instalación antes de guardar.");
+        return;
+      }
+
+      visit.status = outcome;
+      visit.confirmed = true;
+      visit.notes += outcome === "Realizada"
+        ? ` | Resultado Técnico: ${measures} ${notes ? "(" + notes + ")" : ""}`
+        : ` | Cliente ausente al momento de la visita. ${notes}`;
+
+      navigateTo("P05", true);
+      showGlobalFeedback(renderBanner(
+        "ok",
+        "✓",
+        `Visita marcada como «${outcome}» (REQ-F-11)`,
+        outcome === "Realizada"
+          ? "Los datos técnicos quedaron guardados y se notificó a la Empleada para validar satisfacción."
+          : "Se registró la ausencia del cliente sin modificar el pedido y se notificó al local."
+      ));
+    });
+
+    /* ==========================================================================
+       P-07 · REGISTRAR PAGO (CU-05 · Empleada)
+       ========================================================================== */
+    document.getElementById("btn-p07-search").addEventListener("click", function() {
+      const q = document.getElementById("p07-search-input").value.trim().toLowerCase();
+      const fb = document.getElementById("p07-feedback");
+      const card = document.getElementById("p07-order-card");
+      fb.innerHTML = "";
+      card.hidden = true;
+
+      const order = appState.data.orders.find(o => o.id.toLowerCase() === q || o.phone === q);
+      if (!order) {
+        fb.innerHTML = renderBanner("info", "ℹ", "Sin coincidencias", "No encontramos un pedido con ese número o teléfono.");
+        return;
+      }
+
+      const balance = order.total - order.paid;
+      if (balance <= 0) {
+        fb.innerHTML = renderBanner("ok", "✓", "Pedido sin saldo pendiente", `El pedido ${order.id} de ${order.client} ya está pagado en su totalidad.`);
+        return;
+      }
+
+      card.hidden = false;
+      card.innerHTML = `
+        <div class="panel">
+          <h2>Pedido ${order.id} · ${order.client}</h2>
+          <dl class="kv-list" style="margin-bottom: 16px;">
+            <div class="kv-item"><dt>Total acordado</dt><dd>${formatCOP(order.total)}</dd></div>
+            <div class="kv-item"><dt>Abonos registrados</dt><dd>${formatCOP(order.paid)}</dd></div>
+            <div class="kv-item"><dt>Saldo pendiente</dt><dd>${formatCOP(balance)}</dd></div>
+          </dl>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label" for="p07-amount">Monto recibido (COP)</label>
+              <input type="number" id="p07-amount" class="form-control" value="${balance}" min="1" max="${balance}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="p07-method">Medio de pago</label>
+              <select id="p07-method" class="form-control">
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia Bancolombia / Nequi">Transferencia Bancolombia / Nequi</option>
+                <option value="Datafono / Tarjeta">Datáfono / Tarjeta</option>
+              </select>
+            </div>
+          </div>
+          <div class="actions-row">
+            <button type="button" class="btn btn-primary" onclick="confirmOrderPayment('${order.id}')">Confirmar pago y generar comprobante</button>
+          </div>
+        </div>
+      `;
+    });
+
+    window.confirmOrderPayment = function(orderId) {
+      const order = appState.data.orders.find(o => o.id === orderId);
+      const amount = parseFloat(document.getElementById("p07-amount").value) || 0;
+      const method = document.getElementById("p07-method").value;
+      const balance = order.total - order.paid;
+      const fb = document.getElementById("p07-feedback");
+
+      if (amount <= 0 || amount > balance) {
+        fb.innerHTML = renderBanner("error", "✕", "Monto inválido", `Ingrese un valor mayor a $0 y menor o igual al saldo pendiente (${formatCOP(balance)}).`);
+        return;
+      }
+
+      order.paid += amount;
+      const newBalance = order.total - order.paid;
+      if (newBalance === 0) order.status = "Pagado";
+
+      document.getElementById("p07-order-card").hidden = true;
+      fb.innerHTML = renderBanner(
+        "ok",
+        "✓",
+        "Pago registrado correctamente",
+        `Se registró un pago de ${formatCOP(amount)} (${method}) para el pedido ${order.id}. Saldo restante: ${formatCOP(newBalance)}. Comprobante digital listo para descarga.`
+      );
+    };
+
+    /* ==========================================================================
+       P-08 · INVENTARIO (CU-06 · REQ-F-06 · MSG-19, MSG-20)
+       ========================================================================== */
+    function renderP08(query = "") {
+      const tbody = document.getElementById("p08-table-body");
+      const fb = document.getElementById("p08-feedback");
+      const gerActions = document.getElementById("p08-gerente-actions");
+      fb.innerHTML = "";
+
+      gerActions.innerHTML = appState.role === "gerente"
+        ? `<button type="button" class="btn btn-primary" data-nav="P09">+ Registrar ingreso</button>`
+        : "";
+
+      const q = query.trim().toLowerCase();
+      const filtered = appState.data.inventory.filter(item =>
+        !q ||
+        item.name.toLowerCase().includes(q) ||
+        item.ref.toLowerCase().includes(q) ||
+        item.typeColor.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        // MSG-19
+        fb.innerHTML = renderBanner(
+          "info",
+          "ℹ",
+          "Sin resultados (MSG-19)",
+          `No encontramos artículos con “${query}”. Revise el nombre, la referencia, el tipo de tela o el color e inténtelo de nuevo.`
+        );
+        return;
+      }
+
+      // Aviso MSG-20 si hay artículos agotados visibles
+      const outOfStock = filtered.filter(i => i.qty === 0);
+      if (outOfStock.length > 0) {
+        fb.innerHTML = renderBanner(
+          "warning",
+          "⚠",
+          "Artículos sin existencias (MSG-20)",
+          outOfStock.map(i => `El artículo ${i.name} no tiene existencias disponibles. Estado: Agotado.`).join(" ")
+        );
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        let statusBadge = `<span class="badge badge--ok">✓ Disponible</span>`;
+        if (item.qty === 0) {
+          statusBadge = `<span class="badge badge--error">✕ Agotado</span>`;
+        } else if (item.qty <= 6) {
+          statusBadge = `<span class="badge badge--warning">⚠ Existencia baja</span>`;
+        }
+
+        return `
+          <tr>
+            <td><strong>${item.ref}</strong></td>
+            <td>${item.name}</td>
+            <td>${item.typeColor}</td>
+            <td><strong>${item.qty} ${item.unit}</strong></td>
+            <td>${item.updated}</td>
+            <td>${statusBadge}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("form-inv-search").addEventListener("submit", function(e) {
+      e.preventDefault();
+      renderP08(document.getElementById("inv-query").value);
+    });
+
+    document.getElementById("btn-inv-clear").addEventListener("click", function() {
+      document.getElementById("inv-query").value = "";
+      renderP08("");
+    });
+
+    /* ==========================================================================
+       P-09 · INGRESO DE MERCANCÍA (CU-07 · Gerente)
+       ========================================================================== */
+    function renderP09() {
+      const sel = document.getElementById("in-item");
+      sel.innerHTML = appState.data.inventory.map(i =>
+        `<option value="${i.ref}">${i.ref} · ${i.name} (Actual: ${i.qty} ${i.unit})</option>`
+      ).join("");
+    }
+
+    document.getElementById("form-stock-in").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const refDoc = document.getElementById("in-ref").value.trim();
+      const itemRef = document.getElementById("in-item").value;
+      const qty = parseInt(document.getElementById("in-qty").value, 10);
+      const fb = document.getElementById("p09-feedback");
+
+      if (!refDoc || isNaN(qty) || qty <= 0) {
+        fb.innerHTML = renderBanner("error", "✕", "Datos inválidos", "Ingrese una referencia de remisión y una cantidad positiva.");
+        return;
+      }
+
+      const item = appState.data.inventory.find(i => i.ref === itemRef);
+      item.qty += qty;
+      item.updated = TODAY_DISPLAY;
+
+      document.getElementById("in-ref").value = "";
+      document.getElementById("in-qty").value = "";
+
+      navigateTo("P08", true);
+      showGlobalFeedback(renderBanner(
+        "ok",
+        "✓",
+        "Ingreso de mercancía confirmado",
+        `Se sumaron ${qty} ${item.unit} a ${item.name} (${item.ref}). Nueva existencia: ${item.qty} ${item.unit}.`
+      ));
+    });
+
+    /* ==========================================================================
+       P-10 · HISTORIAL DE CLIENTES (CU-08 · REQ-NF-01)
+       ========================================================================== */
+    function renderP10(query = "") {
+      const tbody = document.getElementById("p10-table-body");
+      const q = query.trim().toLowerCase();
+
+      const filtered = appState.data.orders.filter(o =>
+        !q ||
+        o.client.toLowerCase().includes(q) ||
+        o.phone.includes(q) ||
+        o.id.toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">No se encontraron pedidos para “${query}”.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => {
+        const balance = o.total - o.paid;
+        const statusBadge = balance === 0
+          ? `<span class="badge badge--ok">✓ Pagado</span>`
+          : `<span class="badge badge--warning">⚠ Pendiente</span>`;
+
+        const war = appState.data.warranties.find(w => w.orderId === o.id);
+        const warBadge = war
+          ? (war.daysElapsed > 12
+              ? `<span class="badge badge--error">⚠ Plazo excedido (${war.daysElapsed} d)</span>`
+              : `<span class="badge badge--neutral">En fábrica (${war.daysElapsed} d)</span>`)
+          : "Sin garantía";
+
+        return `
+          <tr>
+            <td><strong>${o.id}</strong></td>
+            <td>${o.date}</td>
+            <td>${o.client}<br/><span class="help-text">${o.phone}</span></td>
+            <td><strong>${o.product}</strong><br/><span class="help-text">${o.specs}</span></td>
+            <td>Total: ${formatCOP(o.total)}<br/>Saldo: ${formatCOP(balance)}</td>
+            <td>${statusBadge}</td>
+            <td>${warBadge}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("form-hist-search").addEventListener("submit", function(e) {
+      e.preventDefault();
+      renderP10(document.getElementById("hist-query").value);
+    });
+
+    document.getElementById("btn-hist-all").addEventListener("click", function() {
+      document.getElementById("hist-query").value = "";
+      renderP10("");
+    });
+
+    /* ==========================================================================
+       P-11 · GARANTÍAS (CU-09 · REQ-F-10, REQ-NF-03 · MSG-04, MSG-21)
+       ========================================================================== */
+    function renderP11() {
+      const tbody = document.getElementById("p11-table-body");
+      const orderSelect = document.getElementById("war-order");
+
+      tbody.innerHTML = appState.data.warranties.map(w => {
+        const isOverdue = w.daysElapsed > 12;
+        const badge = isOverdue
+          ? `<span class="badge badge--error">⚠ Plazo excedido</span>`
+          : `<span class="badge badge--neutral">● En fábrica</span>`;
+
+        return `
+          <tr>
+            <td><strong>${w.id}</strong></td>
+            <td>${w.orderId}</td>
+            <td>${w.client} · ${w.product}<br/><span class="help-text">${w.reason}</span></td>
+            <td>${w.sentDate}</td>
+            <td><strong>${w.daysElapsed} días</strong></td>
+            <td>${badge}</td>
+          </tr>
+        `;
+      }).join("");
+
+      orderSelect.innerHTML = appState.data.orders.map(o =>
+        `<option value="${o.id}">${o.id} · ${o.client} (${o.product})</option>`
+      ).join("");
+    }
+
+    document.getElementById("form-new-warranty").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const orderId = document.getElementById("war-order").value;
+      const ref = document.getElementById("war-ref").value.trim();
+      const sentDate = document.getElementById("war-date").value;
+      const reason = document.getElementById("war-reason").value.trim();
+      const fb = document.getElementById("p11-feedback");
+
+      if (!ref || !sentDate || !reason) {
+        fb.innerHTML = renderBanner("error", "✕", "Campos incompletos", "Complete la referencia, fecha de envío y motivo de la garantía.");
+        return;
+      }
+
+      // Validar garantía ya abierta (CU-09 ext. 6a · MSG-21)
+      const existing = appState.data.warranties.find(w => w.orderId === orderId && w.status === "En fábrica");
+      if (existing) {
+        fb.innerHTML = renderBanner(
+          "error",
+          "✕",
+          "Garantía duplicada (MSG-21)",
+          "Ya existe una garantía abierta para este artículo. Revise el registro existente antes de crear otra."
+        );
+        return;
+      }
+
+      const order = appState.data.orders.find(o => o.id === orderId);
+      appState.data.warranties.unshift({
+        id: ref,
+        orderId: order.id,
+        client: order.client,
+        product: order.product,
+        sentDate: formatDisplayDate(sentDate),
+        daysElapsed: 0,
+        reason,
+        status: "En fábrica"
+      });
+
+      document.getElementById("war-ref").value = "";
+      document.getElementById("war-reason").value = "";
+      renderP11();
+
+      fb.innerHTML = renderBanner(
+        "ok",
+        "✓",
+        "Garantía registrada en estado «En fábrica»",
+        `La garantía ${ref} quedó registrada y su seguimiento de plazo de 12 días está activo.`
+      );
+    });
+
+    /* ==========================================================================
+       EVENTOS DE BARRA DE SIMULACIÓN Y DELEGACIÓN GLOBAL
+       ========================================================================== */
+    document.addEventListener("click", function(e) {
+      const navBtn = e.target.closest("[data-nav]");
+      if (navBtn) {
+        navigateTo(navBtn.getAttribute("data-nav"));
+      }
+    });
+
+    document.getElementById("sim-role").addEventListener("change", function(e) {
+      appState.role = e.target.value;
+      appState.techFilter = "ALL";
+      document.getElementById("p02-tech-filter").value = "ALL";
+      if (appState.role === "none") {
+        navigateTo("P01");
+      } else {
+        navigateTo("P02");
+      }
+    });
+
+    document.getElementById("sim-state").addEventListener("change", function(e) {
+      appState.netState = e.target.value;
+      clearGlobalFeedback();
+      renderCurrentScreen();
+    });
+
+    document.getElementById("btn-reset-demo").addEventListener("click", function() {
+      appState.data = getInitialData();
+      appState.netState = "normal";
+      document.getElementById("sim-state").value = "normal";
+      clearGlobalFeedback();
+      renderCurrentScreen();
+      showGlobalFeedback(renderBanner("info", "ℹ", "Datos restablecidos", "El estado del prototipo volvió a sus valores iniciales de prueba."));
+    });
+
+    // Inicialización
+    navigateTo("P02");
+  </script>
+</body>
+</html>
