@@ -51,13 +51,3 @@
 | **NI-13** (nueva) Accesibilidad y adaptabilidad del Técnico en campo | REQ-NF-08, REQ-NF-09 | **Técnico (sin ficha de persona propia, ver pendiente en `ficha-persona-usuario.md`)** · DOL-05 | Pruebas en dispositivos reales — pendiente | **Hueco**: el Técnico nunca ha sido entrevistado; el requisito se apoya en una inferencia del SRS, no en elicitación directa (acción AM-01 de `autoevaluacion-capacidad.md`, todavía sin cerrar). |
 
 ---
-
-## Checklist de cierre (SKILL.md) — verificación de esta entrega
-
-1. **¿Cada afirmación apunta a una fuente del proyecto real?** Sí; cada umbral cita su fuente o se marca explícitamente "valor de ejemplo, por validar".
-2. **¿Hay justificación escrita, no solo un «sí»?** Sí, en la columna "Fuente del umbral" (tabla A) y "Qué debe cumplirse" (tabla B).
-3. **¿Cada requisito tiene las seis partes completas?** Sí en la tabla A (tarea, usuario, contexto, medida, umbral, método); la tabla B sigue su propia estructura de accesibilidad/adaptabilidad.
-4. **¿Lo pendiente está marcado como pendiente?** Sí: cinco de las quince preguntas de la lista de comprobación están en "No" o "Parcial" con responsable asignado, y el hueco NI-13 queda explícito, no oculto.
-5. **¿Se declaró el uso de IA?** Sí, en la nota de alcance inicial, incluyendo la decisión de no duplicar REQ-NF-01 y REQ-NF-04 ya existentes.
-
-*Este documento se sube en `16-usuarios-usabilidad/requisitos-usabilidad.md` y `16-usuarios-usabilidad/checklist-accesibilidad.md` (o como este mismo archivo) por pull request, con al menos un commit propio de cada integrante y revisión de otro integrante antes de fusionar.*

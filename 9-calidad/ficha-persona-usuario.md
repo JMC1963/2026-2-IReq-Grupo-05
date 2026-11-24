@@ -97,13 +97,3 @@ Código: **PER-02** Nombre ficticio y edad: **Doña Esperanza, 48 años** (nombr
 | **DOL-06** | `acta-constitucion.md`, Criterios de éxito; E1, duda pendiente 5 | No hay forma de buscar una venta pasada o una existencia rápido; solo un Excel que suma. | **RNF** | Ya cubierto: REQ-NF-01 del catálogo de calidad y REQ-NF-07.3 de esta sesión (ver tabla A). | Prueba de carga + muestreo de tiempos reales durante el piloto. |
 
 ---
-
-## Checklist de cierre (SKILL.md) — verificación de esta entrega
-
-1. **¿Cada afirmación apunta a una fuente del proyecto real?** Sí; cada dato cita E1 o AT1, o se marca explícitamente como supuesto o síntesis de segunda mano (caso de PER-02).
-2. **¿Hay justificación escrita, no solo un «sí»?** Sí, en cada fila de la sección B y en la columna "Salida" de la sección D.
-3. **¿Las citas son literales y no inventadas?** No se inventó ninguna: se declaró explícitamente que no hay citas textuales reales de ninguna de las dos personas, en vez de fabricarlas.
-4. **¿Lo pendiente está marcado como pendiente?** Sí: la falta de entrevista a la Gerente y al Técnico, la ausencia de frases literales, y el escenario no construido de PER-02 quedan explícitamente señalados.
-5. **¿Se declaró el uso de IA?** Sí, en la nota de alcance inicial.
-
-*Este documento se sube en `16-usuarios-usabilidad/personas/` por pull request, con al menos un commit propio de cada integrante y revisión de otro integrante antes de fusionar.*

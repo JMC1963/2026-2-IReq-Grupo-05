@@ -204,13 +204,3 @@ Asignación tomada de `declaracion-aplicacion-v0.1.md` §7, para no crear una se
 | Por asignar. |
 
 ---
-
-## Checklist de cierre (SKILL.md) — verificación de esta entrega
-
-1. **¿Cada afirmación apunta a una fuente del proyecto real?** Sí; cada estándar, cada requisito y cada responsable cita el documento donde ya estaba decidido (`matriz-aplicabilidad__.md`, `fuentes.md`, `srs-SIGcortinas.md`, `catalogo-rnf.md`, `declaracion-aplicacion-v0.1.md`, `autoevaluacion-capacidad.md`).
-2. **¿Hay justificación escrita, no solo un «sí»?** Sí, en la columna "Adaptación y justificación" de la sección 2 y en cada decisión de las secciones 4 a 7.
-3. **¿Reglas sin condicionales mezclados?** Sí; cada regla de redacción y cada criterio de revisión nombra una sola condición.
-4. **¿Lo pendiente está marcado como pendiente?** Sí: ningún requisito se declara "aprobado" sin evidencia real, la aprobación del plan (sección 11) queda explícitamente pendiente de firma, y el anexo de revisión entre equipos se deja sin diligenciar hasta que exista una revisión real.
-5. **¿Se declaró el uso de IA?** Sí, en la nota de alcance inicial, incluida la regla de vigencia que corrige el error típico de edición (12207:2017 vs. 2026) que el propio Ejemplo PQRS cometió.
-
-*El plan se sube en versión 0.9 por pull request para la revisión entre equipos; con los hallazgos Mayores cerrados o registrados pasa a 1.0, se fusiona y se lleva a firma.*

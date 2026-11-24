@@ -136,13 +136,3 @@
 | Cada nivel fue valorado por dos integrantes y contrastado por los otros dos (sección 1). El contraste del Nivel 1, hecho por quienes valoraron el Nivel 2, confirmó R4 en N tras revisar que ninguna acta del repositorio (`acta-inspeccion__.md`, `catalogo-rnf.md` §7, `declaracion-aplicacion-v0.1.md`) tiene una firma real, solo "pendiente de firma" o "sin aprobación registrada". **Pendiente:** a diferencia del Ejemplo PQRS (donde el Equipo B contrastó la autoevaluación completa), esta versión todavía no tiene contraste de un equipo externo; eso ocurrirá en la Actividad 3 de la guía, cuando el docente asigne un equipo revisor, y se registrará en `10-mejora-adopcion/revision-recibida.md`. |
 
 ---
-
-## Checklist de cierre (SKILL.md) — verificación de esta entrega
-
-1. **¿Cada afirmación apunta a una fuente del proyecto real?** Sí; cada indicador cita la ruta exacta del documento y, donde no hay evidencia real (control de versiones, validación con interesados), se declaró explícitamente "no verificable" en vez de inventar una ruta.
-2. **¿Hay justificación escrita, no solo un «sí»?** Sí, en la columna "Brecha observada" de cada indicador y en cada decisión de la sección 8.
-3. **¿Los escenarios/indicadores tienen sujeto explícito y sin condicionales mezclados?** Sí; cada brecha describe un hecho verificable, no una promesa futura.
-4. **¿Lo pendiente está marcado como pendiente?** Sí: el contraste de un equipo externo (sección 10), la firma de Vicky Beltrán (R4) y la versión del repositorio (sección 1) quedan explícitamente sin confirmar.
-5. **¿Se declaró el uso de IA?** Sí, en la nota de alcance inicial y en la sección 10, incluyendo el error de la IA que se corrigió.
-
-*Este documento se sube en `10-mejora-adopcion/autoevaluacion-capacidad.md` por pull request, con al menos un commit propio de cada integrante y revisión de otro integrante antes de fusionar.*

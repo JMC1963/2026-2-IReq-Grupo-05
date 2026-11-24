@@ -63,13 +63,3 @@ Persona: **PER-01** Nombre: **Marcela (representa a Milena Bermúdez)** Meta: **
 | **Oportunidad y requisito o criterio** | Interfaz de captura rápida que no le quite tiempo de atención (REQ-NF-04, REQ-NF-07.1). | Campos obligatorios con validación (REQ-F-04a, ya existente). | Validación automática del abono inicial (REQ-F-04b, ya existente). | Agenda compartida entre Gerente, Empleada y Técnico (HU-02, CU-02). | Verificación automática de cruces al confirmar (CU-02, paso 6; REQ-F-01a). | Interfaz simple, sin entrenamiento previo (REQ-NF-04, REQ-NF-07.1 — ver `requisitos-usabilidad-accesibilidad.md`). |
 
 ---
-
-## Checklist de cierre (SKILL.md) — verificación de esta entrega
-
-1. **¿Cada afirmación apunta a una fuente del proyecto real?** Sí; cada celda cita E1, AT1 o un CU concreto, y lo inferido se marca explícitamente como "inferido" o "supuesto".
-2. **¿Hay justificación escrita, no solo un «sí»?** Sí, en cada columna "Problemas observados" y "Punto de dolor".
-3. **¿Las tareas están en lenguaje del usuario, no como funciones del sistema?** Sí: "registrar un pedido", "agendar una visita", "consultar existencias" — no "ejecutar INSERT" ni nombres de pantalla.
-4. **¿Lo pendiente está marcado como pendiente?** Sí: la falta de observación directa, de datos de uso y de entrevista al Técnico y a la Gerente queda señalada en la nota de alcance y en la fila de "Supuestos y dudas".
-5. **¿Se declaró el uso de IA?** Sí, en la nota de alcance inicial.
-
-*Este documento se sube en `16-usuarios-usabilidad/contexto-uso.md` y `16-usuarios-usabilidad/tareas.md` (o como este mismo archivo) por pull request, con al menos un commit propio de cada integrante y revisión de otro integrante antes de fusionar.*
