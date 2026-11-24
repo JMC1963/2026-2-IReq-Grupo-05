@@ -1,0 +1,53 @@
+**PLANTILLA PARA DILIGENCIAR · UNIDAD 6 · SESIÓN 1 DE 5**
+
+**Ingeniería de Requisitos**
+
+**Requisitos de usabilidad y accesibilidad medibles — SIGCortinas**
+
+> **Nota de alcance y uso de IA.** Los requisitos de esta tabla **no duplican** los del catálogo de calidad de la Unidad 4 (`09-calidad/catalogo-rnf.md`): donde la necesidad es la misma (REQ-NF-01, REQ-NF-04), esta sesión solo la redacta con la fórmula de seis partes (tarea + usuario + contexto + medida + umbral + método) que exige la Unidad 6, y lo dice explícitamente en la columna "Fuente del umbral" en vez de crear un identificador paralelo — error que el propio proyecto ya corrigió una vez (hilo de `plan-adopcion-estandares.md` §5, "este plan no copia enunciados"). Se numeran como **REQ-NF-07 (usabilidad)**, **REQ-NF-08 (accesibilidad)** y **REQ-NF-09 (adaptabilidad)**, continuando la numeración de `09-calidad/catalogo-rnf.md` (que llega hasta REQ-NF-06), para no abrir un segundo esquema de identificadores dentro del mismo proyecto.
+
+## A. Tabla de requisitos medibles
+
+| ID | Tarea y flujo | Usuario (persona) | Contexto | Medida | Umbral objetivo / mínimo | Método de verificación | Fuente del umbral |
+|---|---|---|---|---|---|---|---|
+| **REQ-NF-07.1** | Registrar un pedido nuevo completo (F-01, CU-01N) | Empleada sin entrenamiento previo en sistemas (PER-01) | En el mostrador del local, atendiendo al cliente, con el cuaderno todavía de referencia durante la transición al nuevo sistema | Éxito sin ayuda y tiempo | 8 de 10 intentos sin ayuda en ≤ 3 min / 7 de 10 en ≤ 5 min | Prueba de usabilidad con cronómetro, antes de salir a producción (Unidad 6, Sesión 5) | **Valor de ejemplo, por validar.** No hay línea base AS-IS medida: la entrevista preguntó "¿Cuánto tarda en registrar una venta?" (pregunta 21) pero no se obtuvo una respuesta numérica registrada en `guia-entrevista-empleada-Milena-Bermudez.md`. **Pendiente:** medir con cronómetro cuánto tarda Milena hoy en el cuaderno antes de fijar el umbral en firme. Misma necesidad que REQ-NF-04 de `09-calidad/catalogo-rnf.md`; esta fila solo la redacta con la fórmula completa. |
+| **REQ-NF-07.2** | Agendar una visita sin que se cruce con otra del Técnico (F-02, CU-02) | Empleada (PER-01), cualquier antigüedad en el puesto | En el mostrador, con el cliente esperando una fecha de visita | Tasa de éxito en detectar un cruce antes de confirmar | 100% de los cruces de horario detectados antes de confirmar la cita / al menos 95% con la agenda cargada al tope de un día | Prueba funcional (ya cubierta por REQ-F-01a, Unidad 3) + prueba de usabilidad simulando un cruce (Unidad 6, Sesión 5) | **Riesgo o consecuencia**: un cruce no detectado hace que el Técnico no pueda cumplir una de las dos citas, con riesgo de que el cliente no vuelva — consecuencia comercial, no solo de tiempo. |
+| **REQ-NF-07.3** | Buscar existencias de un artículo o el historial de un cliente (F-03, CU-06, CU-08) | Gerente (PER-02) o Empleada (PER-01) | Con un cliente esperando en el mostrador | Tiempo | ≤ 60 s en el 100% de las consultas del piloto / igual (no negociable) | Prueba de carga sobre el volumen migrado + muestreo de tiempos reales durante el piloto | **Negociación documentada**: ya acordado como criterio de éxito en `acta-constitucion.md`. Coincide exactamente con REQ-NF-01 de `09-calidad/catalogo-rnf.md`; esta fila no crea un requisito nuevo, solo lo escribe con la fórmula de seis partes de esta sesión. |
+
+## B. Requisitos de accesibilidad y adaptabilidad
+
+| ID | Alcance (pantallas) | Norma, nivel y versión (verificar) | Qué debe cumplirse | Verificación (lista, herramienta, teclado, usuarios) | Fuente de los valores | Pendiente (por confirmar) |
+|---|---|---|---|---|---|---|
+| **REQ-NF-08** Accesibilidad | Todas las pantallas internas de SIGCortinas (Gerente, Empleada, Técnico). **No hay pantallas públicas**: el cliente no accede al sistema (`acta-constitucion.md`, "Fuera de esta fase: acceso de clientes y del proveedor"). | WCAG 2.2, nivel AA, como **buena práctica voluntaria** (versión por verificar) | Operable solo con teclado en el computador de escritorio (Gerente/Empleada); contraste mínimo 4,5:1; ningún estado se indica solo por color (p. ej., una garantía con "Plazo excedido" no solo en rojo, ver `CU-03.md` ext. 2c y `CU-09.md`); cada campo con etiqueta visible y asociada. | Lista de comprobación (sección C) + recorrido solo con teclado sobre el prototipo (Unidad 6, Sesiones 2 a 5). | WCAG 2.2 (W3C, octubre 2023; verificar el estado de WCAG 3.0). | **SIGCortinas es un negocio privado, no una entidad pública**: la Resolución 1519/2020 del MinTIC no le aplica por no ser entidad pública. Por confirmar con un asesor legal (no hay Oficina Jurídica propia, a diferencia del PQRS) si la Ley 1618/2013 o la Ley 1480/2011 imponen alguna obligación de accesibilidad a un comercio pequeño. |
+| **REQ-NF-09** Adaptabilidad | Pantalla de agenda y de registro de resultado de visita que usa el Técnico desde su celular en campo (CU-10; `srs-SIGcortinas.md` §2.1). | Datos de uso **no disponibles** (el sistema no existe todavía); se toma 360 px como valor de referencia por ser el ancho más común en celulares básicos | Sin desplazamiento horizontal desde 360 px de ancho; funciona con conexión de datos móviles intermitente, incluidas visitas a fincas (`CU-02.md`, extensión 4a). | Pruebas en al menos 2 celulares reales y con conexión simulada lenta, antes de salir a producción. | **Valor de ejemplo, por validar.** No hay datos de uso reales del Técnico, porque nunca ha sido entrevistado (ver `ficha-persona-usuario.md`, PER no construida para el Técnico, y acción AM-01 de `autoevaluacion-capacidad.md`). | **Entrevistar al Técnico** para confirmar su equipo real y la calidad de la señal en las zonas donde instala, antes de fijar el umbral en firme. |
+
+## C. Lista de comprobación inicial de accesibilidad
+
+| # | Pregunta | Sí / No / Parcial / No aplica | Nota, requisito o pendiente asociado | Responsable |
+|---|---|---|---|---|
+| **1** | ¿Existe un requisito que nombre la norma y el nivel de accesibilidad y a qué pantallas aplica? | **Parcial** | REQ-NF-08 lo nombra (WCAG 2.2, nivel AA, pantallas internas), pero el nivel es una meta voluntaria, no una obligación legal confirmada. | Equipo de desarrollo |
+| **2** | ¿El requisito dice que todo es operable solo con teclado? | **Sí** | REQ-NF-08. | Equipo de desarrollo |
+| **3** | ¿Hay un requisito para ampliar el texto sin perder contenido ni función? | **No** | No redactado todavía; se suma como pendiente para la Sesión 2 (inventario de pantallas). | Por asignar en la Sesión 2 |
+| **4** | ¿Se pidió contraste suficiente (4,5 a 1 para texto normal, nivel AA)? | **Sí** | REQ-NF-08. | Equipo de desarrollo |
+| **5** | ¿Ninguna información ni estado depende solo del color? | **Sí** | REQ-NF-08 (estado de garantía o de cita no solo en rojo). | Equipo de desarrollo |
+| **6** | ¿Cada campo tiene una etiqueta visible y asociada? | **Parcial** | Lo pide REQ-NF-08 en general; falta especificarlo pantalla por pantalla en la Sesión 2. | Por asignar |
+| **7** | ¿Los errores se indican en texto, junto al campo, y dicen cómo corregir? | **Parcial** | REQ-F-04a ya dice que el sistema "identifica cada campo faltante", pero no se ha verificado el lenguaje exacto del mensaje con una lista. | Equipo de desarrollo |
+| **8** | ¿El foco del teclado se ve y avanza en un orden lógico? | **No** | Pendiente: se decide con el diseño de pantallas de las Sesiones 2 a 4. | Por asignar |
+| **9** | ¿Hay límites de tiempo? ¿Se avisa y se puede guardar lo digitado? | **No aplica** | Ningún caso de uso de SIGCortinas impone un límite de tiempo a la persona que usa el sistema (a diferencia de un trámite con plazo legal de respuesta). | — |
+| **10** | ¿Se definió el ancho mínimo de pantalla y los navegadores, con datos de uso? | **Parcial** | REQ-NF-09 propone 360 px como valor de ejemplo; no hay datos de uso reales porque el sistema no existe todavía. | Equipo de desarrollo |
+| **11** | ¿Se pensó en conexiones lentas y datos limitados? | **Parcial** | REQ-NF-09 lo menciona para el Técnico, sin evidencia real de la señal en terreno. | Equipo de desarrollo |
+| **12** | ¿El lenguaje es el de los usuarios y los términos técnicos se explican? | **Parcial** | Las entrevistas usan lenguaje sencillo ("pedido", "cita", "abono"); no se ha revisado el texto de ninguna pantalla porque todavía no existen. | Por asignar en la Sesión 2 |
+| **13** | ¿Hay una alternativa presencial o por otro canal? | **Sí** | El sistema es interno (Gerente, Empleada, Técnico); el cliente sigue siendo atendido en persona o por teléfono, sin depender de ninguna pantalla. | — |
+| **14** | ¿La verificación incluye una prueba con tecnología de apoyo y personas reales? | **No** | No hay ninguna prueba planeada con lector de pantalla u otra tecnología de apoyo; queda pendiente. | Por asignar |
+| **15** | ¿El alcance legal se confirmó con Jurídica y TI (por confirmar)? | **No** | SIGCortinas no tiene Oficina Jurídica ni área de TI propias; queda como pregunta abierta para la Gerente o un asesor externo, igual que el plazo legal de garantía (REQ-NF-03 del catálogo de calidad). | Gerente (Vicky Beltrán) |
+
+## D. Trazabilidad de las necesidades a los requisitos
+
+| Necesidad (NI-nn) | Requisitos de esta sesión que la cubren | Persona y dolor de origen | Verificación prevista | Diagnóstico (cubierta, parcial, hueco) |
+|---|---|---|---|---|
+| **NI-12** (nueva) Registrar un pedido sin perder tiempo de atención ni datos | REQ-NF-07.1; REQ-NF-04 (ya existente) | PER-01 · DOL-01, DOL-03, DOL-07, DOL-08 | Prueba de usabilidad con cronómetro, Unidad 6, Sesión 5 | **Parcial** — falta medir la línea base AS-IS antes de fijar el umbral en firme |
+| **NI-02** (relacionada con G1.1) Agenda compartida sin cruces | REQ-NF-07.2; ya cubierta funcionalmente por CU-02 y REQ-F-01a | PER-01 · DOL-02, DOL-09 | Prueba funcional + prueba de usabilidad simulando un cruce | **Cubierta** |
+| **NI-09** (relacionada con el criterio de éxito del acta) Búsqueda rápida de ventas e inventario | REQ-NF-07.3; misma fuente que REQ-NF-01 | PER-01, PER-02 · DOL-04, DOL-06 | Prueba de carga + muestreo durante el piloto | **Cubierta** |
+| **NI-13** (nueva) Accesibilidad y adaptabilidad del Técnico en campo | REQ-NF-08, REQ-NF-09 | **Técnico (sin ficha de persona propia, ver pendiente en `ficha-persona-usuario.md`)** · DOL-05 | Pruebas en dispositivos reales — pendiente | **Hueco**: el Técnico nunca ha sido entrevistado; el requisito se apoya en una inferencia del SRS, no en elicitación directa (acción AM-01 de `autoevaluacion-capacidad.md`, todavía sin cerrar). |
+
+---
